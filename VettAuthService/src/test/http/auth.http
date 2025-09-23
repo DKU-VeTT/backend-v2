@@ -1,0 +1,45 @@
+### 회원가입
+### PK - aAPzwpKf-0mFtlfbU1wCWA
+POST http://localhost:8081/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "name" : "오규찬",
+  "userId" : "okc020278",
+  "password" : "!okc020278",
+  "email" : "okc0202@naver.com"
+}
+
+### 로그인
+POST http://localhost:8081/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "userId" : "okc020278",
+  "password" : "!okc020278"
+}
+
+### 아이디 찾기
+GET http://localhost:8081/api/v1/auth/find-id?name=오규찬&email=okc0202@naver.com
+
+### GET USER
+GET http://localhost:8080/api/v1/user/me
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwOTY4OTIwLCJrZXkiOiJqOGF0R0ZaRjNjWlBRbnhRVkE3QVBRIiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.pDKLVh6Uo_TNAe8gS-SgEMA0xrxAxvb2RWWm1FtwDTEhfQwjwjizugf5B3ywelzD8IPJgBPs7H5ei3DXQNQ5Hg
+
+### DELETE USER
+DELETE http://localhost:8081/api/v1/user/me
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwNjE4MzI5LCJrZXkiOiJfV21saU5sdEw2Qm9fUzlJZUVKaFB3Iiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.WWltW2EPZ_aV4WMJl8GyBIEUVFXRFlGUXsCMBcRNsxCBEMC0nG5kxUhclDvBB-Gv6DRL32ooA5907RhepeVINQ
+
+### PATCH USER
+PATCH http://localhost:8081/api/v1/user/me
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwNjE4MzI5LCJrZXkiOiJfV21saU5sdEw2Qm9fUzlJZUVKaFB3Iiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.WWltW2EPZ_aV4WMJl8GyBIEUVFXRFlGUXsCMBcRNsxCBEMC0nG5kxUhclDvBB-Gv6DRL32ooA5907RhepeVINQ
+Content-Type: application/json
+
+{
+  "name" : "찬2",
+  "email" : "okc0202@naver.com"
+}
+
+### GET PASSPORT
+GET http://localhost:8081/api/v1/user/passport
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwOTY4OTIwLCJrZXkiOiJqOGF0R0ZaRjNjWlBRbnhRVkE3QVBRIiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.pDKLVh6Uo_TNAe8gS-SgEMA0xrxAxvb2RWWm1FtwDTEhfQwjwjizugf5B3ywelzD8IPJgBPs7H5ei3DXQNQ5Hg

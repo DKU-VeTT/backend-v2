@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: Vett-Chat-Service
+
+  config:
+    activate:
+      on-profile: local
+    import: optional:file:.env[.properties]
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      enable-auto-commit: false
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  datasource:
+    url: ${RDB_URL}
+    username: ${RDB_USERNAME}
+    password: ${RDB_PASSWORD}
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVICE_URL}
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME}
+
+server:
+  port: 8086
+  servlet:
+    session:
+      timeout: 60m
+      persistent: true
+
+app:
+  domain:
+    client:
+      local: ${APP_CLIENT_LOCAL_DOMAIN}
+      prod: ${APP_CLIENT_PROD_DOMAIN}
+  secret:
+    passport: ${APP_PASSPORT_SECRET}
+    ws: ${APP_WS_SECRET}

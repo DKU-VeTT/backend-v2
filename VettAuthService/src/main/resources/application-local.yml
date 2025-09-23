@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: Vett-Auth-Service
+
+  config:
+    activate:
+      on-profile: local
+    import: optional:file:.env[.properties]
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      enable-auto-commit: false
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  datasource:
+    url: ${RDB_URL}
+    username: ${RDB_USERNAME}
+    password: ${RDB_PASSWORD}
+
+  data:
+    redis:
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      host: ${REDIS_HOST}
+      repositories:
+        enabled: false
+  grpc:
+    server:
+      port: ${GRPC_SERVER_PORT}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVICE_URL}
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME}
+
+
+server:
+  port: 8081
+  servlet:
+    session:
+      timeout: 60m
+      persistent: true
+
+app:
+  domain:
+    client:
+      local: ${APP_CLIENT_LOCAL_DOMAIN}
+      prod: ${APP_CLIENT_PROD_DOMAIN}
+  secret:
+    jwt : ${APP_JWT_SECRET}

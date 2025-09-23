@@ -1,0 +1,3 @@
+### GET Message
+GET http://localhost:8080/api/v1/chat/messages/asdamsd
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyNzgiLCJleHAiOjE3NjExMjkyNzEsImtleSI6IjZQdWw4TmQ4TW52aEdxbzlFS3phVlEiLCJyb2xlIjoi7J2867CYIOyCrOyaqeyekCJ9.l4jKJZ3cYdQY7sbYrUx4hNtRohm3VZPo9OQk9Pyfywg7iLzS69m9_979vcb0RNrtBMNxWuxHDaJyi38H6sMY9Q

@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: Vett-Cloud-Gateway-Service
+
+  config:
+    activate:
+      on-profile: local
+    import: optional:file:.env[.properties]
+
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: vett-auth-service
+              uri: lb://VETT-AUTH-SERVICE
+              predicates:
+                - Path=/api/v1/auth/**, /api/v1/user/**
+            - id: vett-place-service
+              uri: lb://VETT-PLACE-SERVICE
+              predicates:
+                - Path=/api/v1/places/**
+            - id: vett-chatbot-service
+              uri: lb://VETT-CHATBOT-SERVICE
+              predicates:
+                - Path=/api/v1/chatbot/**
+            - id: vett-chatRoom-service
+              uri: lb://VETT-CHATROOM-SERVICE
+              predicates:
+                - Path=/api/v1/chatRooms/**
+            - id: vett-chat-service
+              uri: lb://VETT-CHAT-SERVICE
+              predicates:
+                - Path=/api/v1/chat/**, /sub/**, /ws, /pub/**
+
+
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 60m
+      persistent: true
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    allow-redirects: false
+    service-url:
+      defaultZone: ${EUREKA_SERVICE_URL}
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME}
+
+app:
+  domain:
+    client:
+      local: ${APP_CLIENT_LOCAL_DOMAIN}
+    auth-service: ${APP_AUTH_SERVICE_URL}
+  secret:
+    jwt : ${APP_JWT_SECRET}
+    passport: ${APP_PASSPORT_SECRET}
