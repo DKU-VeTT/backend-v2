@@ -47,7 +47,7 @@ public class AuthenticationFilter implements GlobalFilter {
                     .verify(token);
             String key = jwt.getClaim("key").asString();
             log.info("Jwt verification successfully. UserKey : {}", key);
-            exchange.getAttributes().put("token", token);
+            exchange.getAttributes().put("key",key);
         } catch (TokenExpiredException e){
             throw new CustomException(ErrorCode.EXPIRED_TOKEN);
         } catch (JWTVerificationException e){
