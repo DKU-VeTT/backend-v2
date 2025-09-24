@@ -26,6 +26,8 @@ public class ChatRoomResponse {
     private Long lastMessageNumber;
     private String nickname;
     private ChatRoomStatus status;
+    private boolean isIncludePinInfo;
+    private boolean isPin;
 
     @Builder
     public ChatRoomResponse(ChatRoom chatRoom) {
@@ -38,6 +40,8 @@ public class ChatRoomResponse {
         this.lastMessageTime = chatRoom.getLastMessageTime();
         this.maxParticipants = chatRoom.getMaxParticipants();
         this.status = chatRoom.getStatus();
+        this.isIncludePinInfo = false;
+        this.isPin = false;
     }
 
     @Builder
@@ -55,5 +59,7 @@ public class ChatRoomResponse {
         this.nickname = participant.getNickname();
         this.maxParticipants = chatRoom.getMaxParticipants();
         this.status = chatRoom.getStatus();
+        this.isPin = participant.isPin();
+        this.isIncludePinInfo = true;
     }
 }

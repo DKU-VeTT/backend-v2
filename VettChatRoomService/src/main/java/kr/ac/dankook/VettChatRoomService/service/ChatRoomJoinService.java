@@ -62,7 +62,7 @@ public class ChatRoomJoinService {
     }
 
     @Transactional
-    public void leaveChatRoom(Long roomId,String memberId){
+    public void leaveChatRoom(Long roomId, String memberId){
 
         String encryptRoomId = EncryptionUtil.encrypt(roomId);
         ChatRoom chatRoom = chatRoomRepository.findByIdWithOptimisticLock(roomId)

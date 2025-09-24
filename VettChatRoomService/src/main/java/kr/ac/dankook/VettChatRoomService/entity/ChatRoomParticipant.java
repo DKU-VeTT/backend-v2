@@ -22,8 +22,10 @@ public class ChatRoomParticipant {
 
     @Setter
     private Long currentReadNumber;
+
     @Setter
     private String nickname;
+    private boolean isPin;
 
     @Builder
     public ChatRoomParticipant(String memberId, ChatRoom chatRoom, String nickname){
@@ -31,5 +33,10 @@ public class ChatRoomParticipant {
         this.chatRoom = chatRoom;
         this.nickname = nickname;
         this.currentReadNumber = 0L;
+        this.isPin = false;
+    }
+
+    public void togglePin(){
+        this.isPin = !isPin;
     }
 }

@@ -8,6 +8,7 @@ import kr.ac.dankook.VettChatRoomService.dto.response.ChatRoomResponse;
 import kr.ac.dankook.VettChatRoomService.entity.Passport;
 import kr.ac.dankook.VettChatRoomService.facade.ChatRoomJoinFacade;
 import kr.ac.dankook.VettChatRoomService.service.ChatRoomJoinService;
+import kr.ac.dankook.VettChatRoomService.service.ChatRoomPinService;
 import kr.ac.dankook.VettChatRoomService.service.ChatRoomService;
 import kr.ac.dankook.VettChatRoomService.util.DecryptId;
 import kr.ac.dankook.VettChatRoomService.util.PassportMember;
@@ -27,6 +28,7 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final ChatRoomJoinFacade chatRoomJoinFacade;
     private final ChatRoomJoinService chatRoomJoinService;
+    private final ChatRoomPinService chatRoomPinService;
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<List<ChatRoomResponse>>> getMyChatRooms(
@@ -67,6 +69,15 @@ public class ChatRoomController {
     ){
         return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
                 chatRoomService.getChatRoomListByKeyword(keyword)));
+    }
+
+    @PostMapping("/pin/{roomId}")
+    public ResponseEntity<ApiResponse<Boolean>> togglePin(
+            @PathVariable @DecryptId Long roomId,
+            @PassportMember Passport passport
+    ){
+        return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
+               chatRoomPinService.toggleChatRoomPin(roomId,passport.getKey())));
     }
 
     @GetMapping("/join/{roomId}")

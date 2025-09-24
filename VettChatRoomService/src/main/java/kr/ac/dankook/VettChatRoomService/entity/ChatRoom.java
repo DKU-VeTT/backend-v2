@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -43,6 +45,9 @@ public class ChatRoom extends BaseEntity {
 
     @Column(nullable = false)
     private String ownerId;
+
+    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private final List<ChatRoomParticipant> chatRoomParticipants = new ArrayList<>();
 
     @Builder
     public ChatRoom(String name, String description, int maxParticipants,String ownerId) {
