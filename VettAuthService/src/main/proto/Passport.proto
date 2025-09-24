@@ -1,0 +1,21 @@
+syntax= "proto3";
+
+option java_multiple_files = false;
+option java_package="kr.ac.dankook";
+option java_outer_classname="Passport";
+
+service PassportService {
+  rpc getPassport (PassportRequest) returns (PassportResponse);
+}
+
+message PassportRequest {
+  string key = 1;
+}
+
+message PassportResponse {
+  string key = 1;
+  string name = 2;
+  string userId = 3;
+  string email = 4;
+  string role = 5;
+}

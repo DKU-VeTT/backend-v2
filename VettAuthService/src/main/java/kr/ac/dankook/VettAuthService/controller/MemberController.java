@@ -7,7 +7,6 @@ import kr.ac.dankook.VettAuthService.dto.request.MemberPasswordChangeRequest;
 import kr.ac.dankook.VettAuthService.dto.response.ApiMessageResponse;
 import kr.ac.dankook.VettAuthService.dto.response.ApiResponse;
 import kr.ac.dankook.VettAuthService.dto.response.MemberResponse;
-import kr.ac.dankook.VettAuthService.dto.response.PassportResponse;
 import kr.ac.dankook.VettAuthService.service.AuthService;
 import kr.ac.dankook.VettAuthService.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +23,6 @@ public class MemberController {
 
     private final AuthService authService;
     private final MemberService memberService;
-
-    @GetMapping("/passport")
-    public ResponseEntity<PassportResponse> getPassportToken(@AuthenticationPrincipal PrincipalDetails user){
-        return ResponseEntity.status(200).body(new PassportResponse(user.getMember()));
-    }
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<MemberResponse>> getCurrentMember(
