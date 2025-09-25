@@ -36,6 +36,17 @@ spring:
               predicates:
                 - Path=/api/v1/chat/**, /sub/**, /ws, /pub/**
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      passport:
+        register-health-indicator: true
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000ms
+        permitted-number-of-calls-in-half-open-state: 3
+        event-consumer-buffer-size: 10
+
 
 server:
   port: 8080
@@ -67,3 +78,4 @@ app:
   secret:
     jwt : ${APP_JWT_SECRET}
     passport: ${APP_PASSPORT_SECRET}
+

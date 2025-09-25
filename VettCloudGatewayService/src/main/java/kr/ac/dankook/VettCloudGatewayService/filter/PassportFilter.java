@@ -7,6 +7,7 @@ import kr.ac.dankook.VettCloudGatewayService.config.AuthGrpcConfig;
 import kr.ac.dankook.VettCloudGatewayService.dto.PassportResponse;
 import kr.ac.dankook.VettCloudGatewayService.error.CustomException;
 import kr.ac.dankook.VettCloudGatewayService.error.ErrorCode;
+import kr.ac.dankook.VettCloudGatewayService.service.PassportGrpcService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +30,7 @@ public class PassportFilter implements GlobalFilter {
 
     @Value("${app.secret.passport}")
     private String SECRET;
-
-    private final AuthGrpcConfig authGrpcConfig;
+    private final PassportGrpcService passportGrpcService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -38,7 +38,7 @@ public class PassportFilter implements GlobalFilter {
 
         String key = exchange.getAttribute("key");
 
-        Passport.PassportResponse passport = authGrpcConfig.getPassportInfo(key);
+        Passport.PassportResponse passport = passportGrpcService.getPassportInfo(key);
         if (passport == null) throw new CustomException(ErrorCode.PASSPORT_ERROR);
 
         PassportResponse passportEntity = new PassportResponse(passport);

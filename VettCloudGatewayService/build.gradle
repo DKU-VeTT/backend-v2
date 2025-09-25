@@ -38,6 +38,7 @@ dependencies {
 	compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 	implementation 'io.grpc:grpc-services'
 	implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
 
 	implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
 	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'
