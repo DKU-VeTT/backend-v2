@@ -27,18 +27,13 @@ repositories {
 
 ext {
 	set('springCloudVersion', "2025.0.0")
-	set('springGrpcVersion', "0.3.0")
+	set('springGrpcVersion', "0.10.0")
 }
 
 dependencies {
-	// gRPC
-	implementation "io.grpc:grpc-netty:1.69.0"
-	implementation 'io.grpc:grpc-protobuf:1.57.1'
-	implementation 'io.grpc:grpc-stub:1.57.1'
-	compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+
 	implementation 'io.grpc:grpc-services'
 	implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
-
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -67,18 +62,22 @@ dependencyManagement {
 		mavenBom "org.springframework.grpc:spring-grpc-dependencies:${springGrpcVersion}"
 	}
 }
+// Protobuf 설정
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc:3.25.1"
+		artifact = "com.google.protobuf:protoc:3.25.3"
 	}
 	plugins {
 		grpc {
-			artifact = 'io.grpc:protoc-gen-grpc-java:1.64.0'
+			artifact = 'io.grpc:protoc-gen-grpc-java:1.64.1'
 		}
 	}
 	generateProtoTasks {
 		all()*.plugins {
-			grpc {}
+			grpc {
+				option 'jakarta_omit'
+				option '@generated=omit'
+			}
 		}
 	}
 }

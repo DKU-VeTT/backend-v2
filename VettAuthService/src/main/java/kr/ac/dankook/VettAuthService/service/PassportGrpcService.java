@@ -10,9 +10,10 @@ import kr.ac.dankook.VettAuthService.repository.MemberRepository;
 import kr.ac.dankook.VettAuthService.util.EncryptionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.grpc.server.service.GrpcService;
 import org.springframework.stereotype.Service;
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 @Slf4j
 public class PassportGrpcService extends PassportServiceGrpc.PassportServiceImplBase {

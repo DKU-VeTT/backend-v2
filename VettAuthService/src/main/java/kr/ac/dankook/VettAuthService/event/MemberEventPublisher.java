@@ -35,8 +35,8 @@ public class MemberEventPublisher {
         String payload = outboxEvent.getPayload();
         // redis check -> 이미 보내졌는지 확인
         if (outboxCacheService.checkIsAlreadyPublish(id)) return;
-        CompletableFuture<SendResult<String,String>> future =
-                kafkaTemplate.send(eventType,payload);
+        CompletableFuture<SendResult<String, String>> future =
+                kafkaTemplate.send(eventType, payload);
 
         future.whenComplete((result,ex) -> {
             if (ex == null){
