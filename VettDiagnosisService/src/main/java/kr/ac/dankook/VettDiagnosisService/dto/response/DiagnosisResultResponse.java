@@ -1,0 +1,35 @@
+package kr.ac.dankook.VettDiagnosisService.dto.response;
+
+import kr.ac.dankook.VettDiagnosisService.entity.Diagnosis;
+import kr.ac.dankook.VettDiagnosisService.entity.DiagnosisSecurityLevel;
+import kr.ac.dankook.VettDiagnosisService.entity.DiagnosisType;
+import kr.ac.dankook.VettDiagnosisService.util.EncryptionUtil;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class DiagnosisResultResponse {
+
+    private String id;
+    private DiagnosisType diagnosisType;
+    private String description;
+    private String originalImageId;
+    private String resultImageId;
+    private String diseaseName;
+    private DiagnosisSecurityLevel severityLevel;
+    private double confidenceScore;
+    private String diagnosisResult;
+
+    public DiagnosisResultResponse(Diagnosis diagnosis) {
+        this.id = EncryptionUtil.encrypt(diagnosis.getId());
+        this.diagnosisType = diagnosis.getDiagnosisType();
+        this.description = diagnosis.getDescription();
+        this.originalImageId = diagnosis.getOriginalImageId();
+        this.resultImageId = diagnosis.getResultImageId();
+        this.diseaseName = diagnosis.getDiseaseName();
+        this.severityLevel = diagnosis.getSeverityLevel();
+        this.confidenceScore = diagnosis.getConfidenceScore();
+        this.diagnosisResult = diagnosis.getDiagnosisResult();
+    }
+}
