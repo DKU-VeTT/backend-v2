@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "diagnosis")
@@ -40,5 +44,15 @@ public class Diagnosis extends BaseEntity{
         this.confidenceScore = confidenceScore;
         this.diagnosisResult = diagnosisResult;
         this.memberId = memberId;
+    }
+
+    public List<ObjectId> getImageObjectIds(){
+        List<ObjectId> ids = new ArrayList<>();
+        String originalImageId = this.getOriginalImageId();
+        String diagnosisResultImageId = this.getResultImageId();
+        ids.add(new ObjectId(originalImageId));
+        ids.add(new ObjectId(diagnosisResultImageId));
+
+        return ids;
     }
 }

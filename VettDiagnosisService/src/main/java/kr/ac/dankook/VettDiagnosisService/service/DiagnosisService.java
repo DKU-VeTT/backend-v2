@@ -4,9 +4,11 @@ import kr.ac.dankook.VettDiagnosisService.dto.request.DiagnosisResultRequest;
 import kr.ac.dankook.VettDiagnosisService.dto.response.DiagnosisResultResponse;
 import kr.ac.dankook.VettDiagnosisService.entity.Diagnosis;
 import kr.ac.dankook.VettDiagnosisService.error.exception.EntityNotFoundException;
+import kr.ac.dankook.VettDiagnosisService.event.DiagnosisCompensationEvent;
 import kr.ac.dankook.VettDiagnosisService.repository.DiagnosisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,7 @@ import java.util.List;
 public class DiagnosisService {
 
     private final DiagnosisRepository diagnosisRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Diagnosis getDiagnosisById(Long id) {
         return diagnosisRepository.findById(id)
@@ -42,7 +45,9 @@ public class DiagnosisService {
                 .severityLevel(data.getSeverityLevel())
                 .diseaseName(data.getDiseaseName()).build();
         diagnosisRepository.save(newDiagnosis);
+        eventPublisher.publishEvent(new DiagnosisCompensationEvent(ids));
     }
+
     public void deleteDiagnosisEntity(Long id){
         diagnosisRepository.deleteById(id);
     }

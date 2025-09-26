@@ -10,11 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Passport {
-
     private String key;
     private String name;
     private String userId;
     private String email;
     private String role;
-
 }

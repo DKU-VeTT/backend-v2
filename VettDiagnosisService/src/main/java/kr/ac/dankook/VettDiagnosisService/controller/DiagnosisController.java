@@ -52,6 +52,7 @@ public class DiagnosisController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiMessageResponse> deleteDiagnosisResult(@PathVariable @DecryptId Long id) {
+        diagnosisFacade.deleteDiagnosisResult(id);
         return ResponseEntity.status(201).body(new ApiMessageResponse(true,201,
                 "진단 결과를 성공적으로 삭제하였습니다."));
     }
