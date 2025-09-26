@@ -35,6 +35,10 @@ spring:
               uri: lb://VETT-CHAT-SERVICE
               predicates:
                 - Path=/api/v1/chat/**, /sub/**, /ws, /pub/**
+            - id: vett-diagnosis-service
+              uri: lb://VETT-DIAGNOSIS-SERVICE
+              predicates:
+                - Path=/api/v1/diagnosis/**
 
 resilience4j:
   circuitbreaker:

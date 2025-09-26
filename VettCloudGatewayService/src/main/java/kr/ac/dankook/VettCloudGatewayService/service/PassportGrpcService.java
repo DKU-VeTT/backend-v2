@@ -1,5 +1,4 @@
 package kr.ac.dankook.VettCloudGatewayService.service;
-
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import kr.ac.dankook.Passport;
 import kr.ac.dankook.PassportServiceGrpc;
@@ -8,7 +7,6 @@ import kr.ac.dankook.VettCloudGatewayService.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -23,9 +21,13 @@ public class PassportGrpcService {
         Passport.PassportRequest request = Passport.PassportRequest.newBuilder()
                 .setKey(userKey)
                 .build();
-        return passportServiceStub
-                .withDeadlineAfter(500,TimeUnit.MILLISECONDS)
-                .getPassport(request);
+        try{
+            return passportServiceStub
+                    .withDeadlineAfter(400,TimeUnit.MILLISECONDS)
+                    .getPassport(request);
+        }catch (Exception e){
+           return null;
+        }
     }
 
     public Passport.PassportResponse getPassportFallback(String userKey, Throwable t) {
