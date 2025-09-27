@@ -53,8 +53,6 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
         if (ex instanceof CustomException){
             return new ErrorResponse(errorCode);
         }
-        log.error("Error!!!!");
-        ex.printStackTrace();
         return new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 }

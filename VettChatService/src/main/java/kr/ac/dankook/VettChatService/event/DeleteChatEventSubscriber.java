@@ -18,7 +18,7 @@ public class DeleteChatEventSubscriber {
     private final ChatMessageRepository chatMessageRepository;
     private static final String CHAT_DELETE_TOPIC = "chat.room.event.deleted";
 
-    @KafkaListener(groupId = "VETT_CHAT", topics = CHAT_DELETE_TOPIC)
+    @KafkaListener(groupId = "VETT_CHAT", topics = CHAT_DELETE_TOPIC, concurrency = "1")
     public void handleDeleteChatMessage(String message, Acknowledgment acknowledgment){
         log.info("DELETE SUB {}",message);
         List<ChatMessage> messages = chatMessageRepository.findByRoomId(message);

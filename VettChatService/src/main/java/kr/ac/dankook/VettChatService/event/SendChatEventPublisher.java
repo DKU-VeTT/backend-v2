@@ -25,14 +25,16 @@ public class SendChatEventPublisher {
 
         String payload;
         String topic = EventType.CHAT_ROOM_MESSAGE.getEventType();
+        String roomKey = request.getRoomId();
         try{
             payload = objectMapper.writeValueAsString(request);
         }catch (JsonProcessingException e){
             log.error("Error during parsing messages - {}, {}",request.getMessage(),e.getMessage()) ;
             throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
         }
+        // Key를 RoomId로 설정하여 같은 파티션 내에서는 메시지 순서를 보장하도록 한다.
         CompletableFuture<SendResult<String, String>> future =
-                kafkaTemplate.send(topic, payload);
+                kafkaTemplate.send(topic,roomKey,payload);
         future.whenComplete((result,ex) -> {
             if (ex != null){
                 log.error("Kafka send exception - {}",ex.getMessage());

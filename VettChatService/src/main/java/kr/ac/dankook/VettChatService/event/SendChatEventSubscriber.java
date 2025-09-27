@@ -1,6 +1,5 @@
 package kr.ac.dankook.VettChatService.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.ac.dankook.VettChatService.dto.request.ChatMessageRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +20,13 @@ public class SendChatEventSubscriber {
     private final SimpMessageSendingOperations messagingTemplate;
     private final ObjectMapper objectMapper;
 
-    @KafkaListener(groupId = "VETT_CHAT", topics = CHAT_TOPIC)
+    // Have Three partitions
+    @KafkaListener(groupId = "VETT_CHAT", topics = CHAT_TOPIC, concurrency = "3")
     public void handleReceiveChatMessage(String message, Acknowledgment acknowledgment) {
         try{
             ChatMessageRequest messageDto = objectMapper.readValue(message, ChatMessageRequest.class);
-            log.info("SUB {}",messageDto.getMessage());
             messagingTemplate.convertAndSend(DESTINATION_PREFIX +  messageDto.getRoomId(), messageDto);
-        }catch(JsonProcessingException e){
+        }catch(Exception e){
             log.error("Json processing error during parsing message - {}",e.getMessage());
         }
         acknowledgment.acknowledge();
