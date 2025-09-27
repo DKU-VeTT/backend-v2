@@ -19,11 +19,13 @@ public class Diagnosis extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
     private DiagnosisType diagnosisType;
     private String description;
     private String originalImageId;
     private String resultImageId;
     private String diseaseName;
+    @Enumerated(EnumType.STRING)
     private DiagnosisSecurityLevel severityLevel;
     private double confidenceScore;
     private String memberId;

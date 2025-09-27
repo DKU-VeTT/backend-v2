@@ -36,18 +36,18 @@ public class DiagnosisController {
     private final DiagnosisService diagnosisService;
     private final StorageService storageService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<ApiMessageResponse> saveDiagnosisResult(
             @RequestPart("file") List<MultipartFile> file,
-            @Valid @RequestPart("data") DiagnosisResultRequest data,
+            @RequestPart("data") @Valid DiagnosisResultRequest data,
             @PassportMember Passport passport
     ){
         if (file == null || file.size() != 2){
             throw new CustomException(ErrorCode.INVALID_REQUEST_PARAM);
         }
-        diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey());
+         diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey());
         return ResponseEntity.status(201).body(new ApiMessageResponse(true,201,
-                "진단 결과를 성공적으로 저장 완료하였습니다."));
+                 "진단 결과를 성공적으로 저장 완료하였습니다."));
     }
 
     @DeleteMapping("/{id}")
@@ -65,12 +65,12 @@ public class DiagnosisController {
     }
 
     @GetMapping("/file/{id}")
-    public ResponseEntity<ApiResponse<Resource>> getImageFile(@PathVariable String id){
+    public ResponseEntity<Resource> getImageFile(@PathVariable String id){
         var res = storageService.getFile(new ObjectId(id));
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(res.getContentType()))
                 .cacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic())
                 .eTag(res.getFilename())
-                .body(new ApiResponse<>(true,200,res));
+                .body(res);
     }
 }

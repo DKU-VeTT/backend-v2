@@ -1,6 +1,11 @@
 spring:
   application:
     name: Vett-Diagnosis-Service
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 40MB
+      enabled: true
 
   config:
     activate:
@@ -48,6 +53,8 @@ server:
     session:
       timeout: 60m
       persistent: true
+  tomcat:
+    max-http-form-post-size: 50MB
 
 app:
   secret:
