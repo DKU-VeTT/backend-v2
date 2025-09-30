@@ -8,7 +8,6 @@ import lombok.Getter;
 public enum OutboxEventType {
 
     USER_CREATED("USER","user.event.created"),
-    USER_MODIFIED("USER","user.event.modified"),
     USER_DELETED("USER","user.event.deleted");
 
     private final String domain;

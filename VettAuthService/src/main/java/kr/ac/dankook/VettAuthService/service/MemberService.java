@@ -49,10 +49,7 @@ public class MemberService {
     @Transactional
     public void editMemberInfo(Member member,String name,String email){
         member.updateMemberInfo(name,email);
-        Outbox outbox = memberOutboxService.makeOutbox(member, OutboxEventType.USER_MODIFIED);
-        outboxRepository.save(outbox);
         memberRepository.save(member);
-        eventPublisher.publishEvent(new OutboxEvent(outbox));
     }
 
     @Transactional

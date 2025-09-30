@@ -3,6 +3,8 @@ package kr.ac.dankook.VettAuthService.util;
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import kr.ac.dankook.VettAuthService.error.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -10,10 +12,20 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 @Slf4j
+@Component
 public class EncryptionUtil {
 
-    private static final String ALGORITHM = "AES";
-    private static final byte[] SECRET_KEY = "NaHCSecretKey123".getBytes();
+    private static String ALGORITHM;
+    private static byte[] SECRET_KEY;
+
+    @Value("${app.secret.entity}")
+    public void setSecretKey(String secretKey) {
+        SECRET_KEY = secretKey.getBytes();
+    }
+    @Value("${app.secret.algorithm.entity}")
+    public void setAlgorithm(String algorithm) {
+        ALGORITHM = algorithm;
+    }
 
     public static String encrypt(Long value) {
         try{

@@ -81,3 +81,6 @@ app:
       prod: ${APP_CLIENT_PROD_DOMAIN}
   secret:
     jwt : ${APP_JWT_SECRET}
+    entity: ${APP_ENTITY_SECRET}
+    algorithm:
+      entity: ${APP_ENTITY_ENCRYPT_ALGORITHM}

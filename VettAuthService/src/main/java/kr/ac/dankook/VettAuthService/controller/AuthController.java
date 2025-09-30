@@ -1,6 +1,5 @@
 package kr.ac.dankook.VettAuthService.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import kr.ac.dankook.VettAuthService.dto.request.LoginRequest;
 import kr.ac.dankook.VettAuthService.dto.request.PasswordChangeRequest;
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -66,6 +64,7 @@ public class AuthController {
         return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
                 authService.getUserIdByNameAndEmail(name,email)));
     }
+
     // 비밀번호 찾기를 위한 인증번호 전송
     @PostMapping("/find-password/certificate")
     public ResponseEntity<ApiResponse<String>> sendCertificateCode(

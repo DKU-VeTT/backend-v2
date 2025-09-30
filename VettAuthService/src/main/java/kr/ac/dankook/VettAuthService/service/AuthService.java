@@ -40,9 +40,6 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthCacheService authCacheService;
     private final AuthMailService authMailService;
-    private final MemberOutboxService memberOutboxService;
-    private final OutboxRepository outboxRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
 
     private MailRequest generateMailRequest(String email, String randomCode) {
@@ -72,17 +69,13 @@ public class AuthService {
         if (memberRepository.existsByUserId(signupRequest.getUserId())){
             throw new CustomException(ErrorCode.DUPLICATE_ID);
         }
-
         Member newMember = Member.builder()
                 .email(signupRequest.getEmail())
                 .name(signupRequest.getName())
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .userId(signupRequest.getUserId())
                 .role(MemberRole.USER).build();
-        memberRepository.saveAndFlush(newMember);
-        Outbox outbox = memberOutboxService.makeOutbox(newMember,OutboxEventType.USER_CREATED);
-        outboxRepository.save(outbox);
-        eventPublisher.publishEvent(new OutboxEvent(outbox));
+        memberRepository.save(newMember);
     }
 
     public TokenResponse login(LoginRequest loginRequest){
