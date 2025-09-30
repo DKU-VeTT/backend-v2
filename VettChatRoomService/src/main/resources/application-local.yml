@@ -56,3 +56,6 @@ server:
 app:
   secret:
     passport: ${APP_PASSPORT_SECRET}
+    entity: ${APP_ENTITY_SECRET}
+    algorithm:
+      entity: ${APP_ENTITY_ENCRYPT_ALGORITHM}
