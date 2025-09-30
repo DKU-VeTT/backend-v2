@@ -2,13 +2,11 @@ package kr.ac.dankook.VettCloudGatewayService.config;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import kr.ac.dankook.Passport;
 import kr.ac.dankook.PassportServiceGrpc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 @Configuration
 @Slf4j

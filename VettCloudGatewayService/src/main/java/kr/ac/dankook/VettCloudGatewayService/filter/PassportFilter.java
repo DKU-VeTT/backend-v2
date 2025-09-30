@@ -3,7 +3,6 @@ package kr.ac.dankook.VettCloudGatewayService.filter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.ac.dankook.Passport;
-import kr.ac.dankook.VettCloudGatewayService.config.AuthGrpcConfig;
 import kr.ac.dankook.VettCloudGatewayService.dto.PassportResponse;
 import kr.ac.dankook.VettCloudGatewayService.error.CustomException;
 import kr.ac.dankook.VettCloudGatewayService.error.ErrorCode;
@@ -18,7 +17,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 

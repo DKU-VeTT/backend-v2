@@ -29,7 +29,6 @@ public class PlaceService {
     public List<PlaceResponse> getAllPlace(Pageable pageable){
         // Page original Entity
         Page<Place> allPlaces = placeRepository.findAll(pageable);
-
         // PlaceIds Set
         Set<Long> placeIds = allPlaces.stream()
                 .map(Place::getId)
@@ -40,7 +39,6 @@ public class PlaceService {
         Map<Long, List<PlaceOperatingHour>> hoursMap =
                 // if not fetch join ho.getPlace() -> N+1 problem
                 hours.stream().collect(Collectors.groupingBy(ho -> ho.getPlace().getId()));
-
         return allPlaces.stream().map(item ->
                 PlaceEntityConverter.convertToPlaceResponse(
                         item,true,hoursMap.getOrDefault(item.getId(), List.of()))).toList();

@@ -4,14 +4,12 @@ import kr.ac.dankook.VettPlaceService.entity.PlaceCategory;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.List;
 
 @Getter
 @Setter
 @Builder
 public class PlaceResponse {
-
     private Long id;
     private String addFeeInfo;
     private String placeName;

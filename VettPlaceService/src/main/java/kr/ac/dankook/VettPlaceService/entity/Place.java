@@ -59,9 +59,4 @@ public class Place {
         this.regionCode = regionCode;
         this.addFeeInfo = addFeeInfo;
     }
-
-    public void addOperatingHour(PlaceOperatingHour hour) {
-        this.operatingHours.add(hour);
-        hour.setPlace(this);
-    }
 }

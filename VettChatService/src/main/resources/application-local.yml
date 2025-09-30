@@ -57,3 +57,6 @@ app:
   secret:
     passport: ${APP_PASSPORT_SECRET}
     ws: ${APP_WS_SECRET}
+    entity: ${APP_ENTITY_SECRET}
+    algorithm:
+      entity: ${APP_ENTITY_ENCRYPT_ALGORITHM}

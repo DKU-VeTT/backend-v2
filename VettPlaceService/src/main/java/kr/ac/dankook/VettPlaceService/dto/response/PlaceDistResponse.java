@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @Builder
 public class PlaceDistResponse {
-
     private PlaceResponse placeResponse;
     private double distance;
     private String distanceStringFormat;

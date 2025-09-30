@@ -11,7 +11,6 @@ import java.time.LocalTime;
 @Setter
 @Builder
 public class PlaceOperatingHourResponse {
-
     private DayType dayType;
     private LocalTime openTime;
     private LocalTime closeTime;
