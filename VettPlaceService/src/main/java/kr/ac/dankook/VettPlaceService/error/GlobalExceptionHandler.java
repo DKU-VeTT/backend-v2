@@ -2,6 +2,7 @@ package kr.ac.dankook.VettPlaceService.error;
 
 import kr.ac.dankook.VettPlaceService.error.exception.CustomException;
 import kr.ac.dankook.VettPlaceService.error.exception.EntityNotFoundException;
+import kr.ac.dankook.VettPlaceService.error.exception.ExternalApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse("E001", e.getMessage()));
+    }
+
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ErrorResponse> handleExternalApiException(ExternalApiException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("E004",e.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)

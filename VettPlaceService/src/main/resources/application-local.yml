@@ -48,3 +48,12 @@ server:
 app:
   secret:
     passport: ${APP_PASSPORT_SECRET}
+  kakao:
+    api:
+      key: ${KAKAO_API_KEY}
+    address-to-coordinate:
+      host: ${KAKAO_ADDRESS_TO_COORDINATE_HOST}
+      path: ${KAKAO_ADDRESS_TO_COORDINATE_PATH}
+    route:
+      host: ${KAKAO_ROUTE_HOST}
+      path: ${KAKAO_ROUTE_PATH}

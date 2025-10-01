@@ -1,0 +1,7 @@
+### 카카오 주소 -> 좌표 변환
+GET http://localhost:8080/api/v1/places/kakao/coordinate?address=경기도 수원시 장안구 대평로 27
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwOTY4OTIwLCJrZXkiOiJqOGF0R0ZaRjNjWlBRbnhRVkE3QVBRIiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.pDKLVh6Uo_TNAe8gS-SgEMA0xrxAxvb2RWWm1FtwDTEhfQwjwjizugf5B3ywelzD8IPJgBPs7H5ei3DXQNQ5Hg
+
+### 카카오 교통정보 반환
+GET http://localhost:8080/api/v1/places/kakao/route?statLatitude=37.2906870184418&statLongitude=126.994990959844&desLatitude=37.3120218417632&desLongitude=126.991650331679
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwOTY4OTIwLCJrZXkiOiJqOGF0R0ZaRjNjWlBRbnhRVkE3QVBRIiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.pDKLVh6Uo_TNAe8gS-SgEMA0xrxAxvb2RWWm1FtwDTEhfQwjwjizugf5B3ywelzD8IPJgBPs7H5ei3DXQNQ5Hg
