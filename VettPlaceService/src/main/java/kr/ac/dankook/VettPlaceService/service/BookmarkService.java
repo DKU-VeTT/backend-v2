@@ -1,7 +1,6 @@
 package kr.ac.dankook.VettPlaceService.service;
 
 import kr.ac.dankook.VettPlaceService.dto.response.BookmarkResponse;
-import kr.ac.dankook.VettPlaceService.dto.response.PlaceResponse;
 import kr.ac.dankook.VettPlaceService.entity.Bookmark;
 import kr.ac.dankook.VettPlaceService.entity.Place;
 import kr.ac.dankook.VettPlaceService.error.ErrorCode;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -37,7 +35,12 @@ public class BookmarkService {
         bookmarkRepository.save(bookmark);
     }
 
-    public void deleteBookmark(Long bookmarkId){
+    public void deleteBookmark(String memberId, Long bookmarkId){
+        Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
+                        .orElseThrow(() -> new EntityNotFoundException("즐겨찾기 내역이 존재하지 않습니다."));
+        if (!bookmark.getMemberId().equals(memberId)){
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
         bookmarkRepository.deleteById(bookmarkId);
     }
 

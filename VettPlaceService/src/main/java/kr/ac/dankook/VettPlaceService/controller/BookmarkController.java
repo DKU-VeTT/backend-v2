@@ -9,7 +9,6 @@ import kr.ac.dankook.VettPlaceService.util.PassportMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -27,8 +26,10 @@ public class BookmarkController {
     }
 
     @DeleteMapping("/{bookmarkId}")
-    public ResponseEntity<ApiMessageResponse> deleteBookmark(@PathVariable Long bookmarkId){
-        bookmarkService.deleteBookmark(bookmarkId);
+    public ResponseEntity<ApiMessageResponse> deleteBookmark(
+            @PassportMember Passport passport,
+            @PathVariable Long bookmarkId){
+        bookmarkService.deleteBookmark(passport.getKey(),bookmarkId);
         return ResponseEntity.status(200).body(new ApiMessageResponse(true,201,
                 "즐겨찾기 해제에 성공하였습니다."));
     }
