@@ -4,12 +4,14 @@ import kr.ac.dankook.VettChatBotService.document.ChatBotHistory;
 import kr.ac.dankook.VettChatBotService.document.ChatBotRole;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ChatBotHistoryResponse {
 
     private String sessionId;

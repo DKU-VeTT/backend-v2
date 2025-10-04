@@ -32,6 +32,12 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+    redis:
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      host: ${REDIS_HOST}
+      repositories:
+        enabled: false
 
 eureka:
   client:

@@ -7,6 +7,8 @@ import kr.ac.dankook.VettChatBotService.dto.response.ChatBotRoomResponse;
 import kr.ac.dankook.VettChatBotService.entity.Passport;
 import kr.ac.dankook.VettChatBotService.service.ChatBotHistoryService;
 import kr.ac.dankook.VettChatBotService.service.ChatBotRoomService;
+import kr.ac.dankook.VettChatBotService.service.IdempotencyService;
+import kr.ac.dankook.VettChatBotService.util.HashUtil;
 import kr.ac.dankook.VettChatBotService.util.PassportMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ public class ChatBotController {
 
     private final ChatBotHistoryService chatBotHistoryService;
     private final ChatBotRoomService chatBotRoomService;
+    private final IdempotencyService idempotencyService;
 
     @GetMapping("/{sessionId}")
     public ResponseEntity<ApiResponse<List<ChatBotHistoryResponse>>> getAllChatHistory(
@@ -34,6 +37,7 @@ public class ChatBotController {
         ));
     }
 
+
     @GetMapping("/rooms")
     public ResponseEntity<ApiResponse<List<ChatBotRoomResponse>>> getAllChatBotRoomsByMember(
             @PassportMember Passport passport
@@ -42,14 +46,23 @@ public class ChatBotController {
                 chatBotRoomService.getAllChatBotRoomByMember(passport.getKey())));
     }
 
+
     @PostMapping("/room")
     public ResponseEntity<ApiResponse<ChatBotRoomResponse>> saveNewChatBotRoom(
             @RequestParam("title") String title,
+            @RequestHeader("Idempotency-Key") String key,
             @PassportMember Passport passport
     ){
+        String hash = HashUtil.sha256HexOfParts(key,title);
+        ChatBotRoomResponse res = idempotencyService.execute(
+                key,hash,
+                () -> chatBotRoomService.saveNewChatBotRoom(passport.getKey(), title),
+                ChatBotRoomResponse.class
+        );
         return ResponseEntity.status(201).body(new ApiResponse<>(true,201,
-                chatBotRoomService.saveNewChatBotRoom(passport.getKey(), title)));
+                res));
     }
+
 
     @DeleteMapping("/room/{sessionId}")
     public ResponseEntity<ApiMessageResponse> deleteChatBotRoom(
@@ -59,6 +72,7 @@ public class ChatBotController {
         return ResponseEntity.status(200).body(new ApiMessageResponse(true,200,
                 "챗봇방 삭제를 완료하였습니다."));
     }
+
 
     @PatchMapping("/room/{sessionId}/{title}")
     public ResponseEntity<ApiResponse<Boolean>> updateChatBotRoom(

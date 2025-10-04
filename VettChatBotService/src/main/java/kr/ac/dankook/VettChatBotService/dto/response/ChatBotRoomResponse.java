@@ -4,12 +4,14 @@ import kr.ac.dankook.VettChatBotService.entity.ChatBotRoom;
 import kr.ac.dankook.VettChatBotService.util.EncryptionUtil;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ChatBotRoomResponse {
 
     private String id;
