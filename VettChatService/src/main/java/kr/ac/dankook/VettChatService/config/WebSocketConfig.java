@@ -26,8 +26,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry){
         registry.addEndpoint("/ws")
-                .setAllowedOrigins(LOCAL_FRONT_ADDRESS,PROD_FRONT_ADDRESS)
-                .addInterceptors(passportHandshakeInterceptor);
+                .setAllowedOrigins(LOCAL_FRONT_ADDRESS,PROD_FRONT_ADDRESS);
+                //.addInterceptors(passportHandshakeInterceptor);
     }
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry){

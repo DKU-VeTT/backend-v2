@@ -31,6 +31,7 @@ public class PassportHandshakeInterceptor implements HandshakeInterceptor {
                                    WebSocketHandler wsHandler, Map<String, Object> attrs) {
 
         var headers = req.getHeaders();
+        log.info("Request WS Handshake");
         String passportKey = headers.getFirst("X-Passport-Secret");
         if (!passportKey.equals(PASSPORT_SECRET_KEY)) throw new CustomException(ErrorCode.UNAUTHORIZED);
 

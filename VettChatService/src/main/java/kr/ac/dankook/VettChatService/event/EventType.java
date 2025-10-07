@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum EventType {
 
-    CHAT_ROOM_DELETED("CHAT","chat.room.event.deleted"),
+    MEMBER_DELETED("MEMBER","chat.room.event.deleted"),
     CHAT_ROOM_MESSAGE("CHAT","chat.room.event.message");
 
     private final String domain;

@@ -1,12 +1,16 @@
 package kr.ac.dankook.VettChatService.entity;
 
 import jakarta.persistence.*;
+import kr.ac.dankook.VettChatService.error.ErrorCode;
+import kr.ac.dankook.VettChatService.error.exception.CustomException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -43,9 +47,41 @@ public class ChatRoom extends BaseEntity {
     @Column(nullable = false)
     private String ownerId;
 
+    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private final List<ChatRoomParticipant> chatRoomParticipants = new ArrayList<>();
+
+    @Builder
+    public ChatRoom(String name, String description, int maxParticipants,String ownerId) {
+        this.name = name;
+        this.description = description;
+        this.maxParticipants = maxParticipants;
+        this.ownerId = ownerId;
+        this.currentParticipants = 1;
+        this.status = ChatRoomStatus.READ_WRITE;
+        this.lastMessageNumber = 0L;
+    }
+
+    public void increaseParticipants() {
+        if (this.currentParticipants >= this.maxParticipants){
+            throw new CustomException(ErrorCode.EXCEED_PARTICIPANT);
+        }
+        this.currentParticipants++;
+    }
+
+    public int decreaseParticipants() {
+        if (this.currentParticipants <= 0){
+            throw new CustomException(ErrorCode.RANGE_ERROR_PARTICIPANT);
+        }
+        return --this.currentParticipants;
+    }
+
     public void updateMessages(String lastMessage){
         this.lastMessage = lastMessage;
         this.lastMessageTime = LocalDateTime.now();
         this.lastMessageNumber++;
+    }
+
+    public void updateChatRoomStatus(ChatRoomStatus status){
+        this.status = status;
     }
 }

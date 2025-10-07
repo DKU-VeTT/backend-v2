@@ -13,7 +13,14 @@ public enum ErrorCode {
     // 권한관련 에러
     ACCESS_DENIED(HttpStatus.FORBIDDEN,"P001","접근 권한이 존재하지 않습니다."),
 
-    INVALID_STOMP_TOKEN(HttpStatus.UNAUTHORIZED,"C001","유효하지 않은 채팅 연결 토큰입니다."),
+    // 채팅관련 에러
+    EXCEED_PARTICIPANT(HttpStatus.INTERNAL_SERVER_ERROR,"C001","최대 참가 인원을 초과하였습니다."),
+    RANGE_ERROR_PARTICIPANT(HttpStatus.NOT_FOUND,"C002","채팅방에 참여한 참가자가 존재하지 않습니다"),
+    DELAY_JOIN_CHATROOM(HttpStatus.INTERNAL_SERVER_ERROR,"C003","채팅방 참여가 잠시 지연되었습니다. 3분 내로 입장 처리 하겠습니다."),
+    DELAY_LEAVE_CHATROOM(HttpStatus.INTERNAL_SERVER_ERROR,"C004","채팅방 나가기가 잠시 지연되었습니다. 잠시만 기다려주세요."),
+    ALREADY_JOIN_CHATROOM(HttpStatus.INTERNAL_SERVER_ERROR,"C005","이미 해당 채팅방에 참여중입니다."),
+    INVALID_STOMP_TOKEN(HttpStatus.UNAUTHORIZED,"C006","유효하지 않은 채팅 연결 토큰입니다."),
+
     // 입력값 검증 에러
     INVALID_ENCRYPT_PK(HttpStatus.BAD_REQUEST,"V001", "유효하지 않은 데이터 아이디 형식입니다."),
     INVALID_REQUEST_PARAM(HttpStatus.BAD_REQUEST,"V002","필수 입력 항목이 누락되었습니다."),

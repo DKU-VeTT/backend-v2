@@ -24,7 +24,7 @@ public class ChatController {
     private final ChatMetaService chatMetaService;
 
     // Prefix /pub
-    @MessageMapping("/message")
+    @MessageMapping("/chat/message")
     public void sendMessage(
             @Payload ChatMessageRequest request) {
         chatMetaService.updateRoomMetadataAsync(request);

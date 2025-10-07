@@ -1,6 +1,7 @@
 package kr.ac.dankook.VettChatService.dto.response;
 
 import kr.ac.dankook.VettChatService.entity.ChatRoom;
+import kr.ac.dankook.VettChatService.entity.ChatRoomParticipant;
 import kr.ac.dankook.VettChatService.entity.ChatRoomStatus;
 import kr.ac.dankook.VettChatService.util.EncryptionUtil;
 import lombok.Builder;
@@ -25,6 +26,8 @@ public class ChatRoomResponse {
     private Long lastMessageNumber;
     private String nickname;
     private ChatRoomStatus status;
+    private boolean isIncludePinInfo;
+    private boolean isPin;
 
     @Builder
     public ChatRoomResponse(ChatRoom chatRoom) {
@@ -37,5 +40,26 @@ public class ChatRoomResponse {
         this.lastMessageTime = chatRoom.getLastMessageTime();
         this.maxParticipants = chatRoom.getMaxParticipants();
         this.status = chatRoom.getStatus();
+        this.isIncludePinInfo = false;
+        this.isPin = false;
+    }
+
+    @Builder
+    public ChatRoomResponse(ChatRoomParticipant participant){
+        ChatRoom chatRoom = participant.getChatRoom();
+        this.roomId = EncryptionUtil.encrypt(chatRoom.getId());
+        this.name = chatRoom.getName();
+        this.description = chatRoom.getDescription();
+        this.currentParticipants = chatRoom.getCurrentParticipants();
+        this.lastMessage = chatRoom.getLastMessage();
+        this.createdAt = chatRoom.getCreatedDateTime();
+        this.lastMessageTime = chatRoom.getLastMessageTime();
+        this.currentReadNumber = participant.getCurrentReadNumber();
+        this.lastMessageNumber = chatRoom.getLastMessageNumber();
+        this.nickname = participant.getNickname();
+        this.maxParticipants = chatRoom.getMaxParticipants();
+        this.status = chatRoom.getStatus();
+        this.isPin = participant.isPin();
+        this.isIncludePinInfo = true;
     }
 }
