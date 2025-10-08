@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/v1/ai/diagnosis")
+@RequestMapping("/api/v1/ai/record/diagnosis")
 public class DiagnosisController {
 
     private final DiagnosisFacade diagnosisFacade;
@@ -38,11 +38,11 @@ public class DiagnosisController {
 
     @PostMapping
     public ResponseEntity<ApiMessageResponse> saveDiagnosisResult(
-            @RequestPart("file") List<MultipartFile> file,
+            @RequestPart("file") MultipartFile file,
             @RequestPart("data") @Valid DiagnosisResultRequest data,
             @PassportMember Passport passport
     ){
-        if (file == null || file.size() != 2){
+        if (file == null){
             throw new CustomException(ErrorCode.INVALID_REQUEST_PARAM);
         }
          diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey());

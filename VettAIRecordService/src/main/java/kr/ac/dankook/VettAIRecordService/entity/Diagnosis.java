@@ -23,7 +23,6 @@ public class Diagnosis extends BaseEntity{
     private DiagnosisType diagnosisType;
     private String description;
     private String originalImageId;
-    private String resultImageId;
     private String diseaseName;
     @Enumerated(EnumType.STRING)
     private DiagnosisSecurityLevel severityLevel;
@@ -35,25 +34,15 @@ public class Diagnosis extends BaseEntity{
 
     @Builder
     public Diagnosis(DiagnosisType diagnosisType, String description, String originalImageId,
-                     String resultImageId,  String diseaseName, DiagnosisSecurityLevel severityLevel,
+                     String diseaseName, DiagnosisSecurityLevel severityLevel,
                      double confidenceScore, String diagnosisResult,String memberId) {
         this.diagnosisType = diagnosisType;
         this.description = description;
         this.originalImageId = originalImageId;
-        this.resultImageId = resultImageId;
         this.diseaseName = diseaseName;
         this.severityLevel = severityLevel;
         this.confidenceScore = confidenceScore;
         this.diagnosisResult = diagnosisResult;
         this.memberId = memberId;
-    }
-
-    public List<ObjectId> getImageObjectIds(){
-        List<ObjectId> ids = new ArrayList<>();
-        String originalImageId = this.getOriginalImageId();
-        String diagnosisResultImageId = this.getResultImageId();
-        ids.add(new ObjectId(originalImageId));
-        ids.add(new ObjectId(diagnosisResultImageId));
-        return ids;
     }
 }

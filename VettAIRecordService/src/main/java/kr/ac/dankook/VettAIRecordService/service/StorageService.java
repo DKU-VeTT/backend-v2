@@ -23,7 +23,7 @@ public class StorageService {
 
     private final GridFsTemplate gridFsTemplate;
 
-    private String uploadFile(MultipartFile file) {
+    public String uploadFile(MultipartFile file) {
         try (var in = file.getInputStream()) {
             var contentType = Optional.of(file.getContentType()).orElse("application/octet-stream");
             var meta = new org.bson.Document("contentType", contentType);
@@ -37,33 +37,17 @@ public class StorageService {
         }
     }
 
-    public List<String> uploadFilesAndGetIds(List<MultipartFile> files) {
-        List<String> uploadedIds = new ArrayList<>();
-        try {
-            for (MultipartFile f : files) {
-                String id = uploadFile(f);
-                uploadedIds.add(id);
-            }
-            return uploadedIds;
-        } catch (Exception e) {
-            deleteFiles(uploadedIds.stream().map(ObjectId::new).toList());
-            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
-        }
-    }
-
     public GridFsResource getFile(ObjectId id){
         var file = gridFsTemplate.findOne(getQueryById(id));
         return gridFsTemplate.getResource(file);
     }
 
-    public void deleteFiles(List<ObjectId> ids){
-        ids.forEach(i -> {
-            try{
-                gridFsTemplate.delete(getQueryById(i));
-            }catch (Exception e){
-                log.error("Delete file failed. id={}, ex={}", i.toHexString(), e.getMessage());
-            }
-        });
+    public void deleteFile(ObjectId id){
+        try{
+            gridFsTemplate.delete(getQueryById(id));
+        }catch (Exception e){
+            log.error("Delete file failed. id={}, ex={}", id.toHexString(), e.getMessage());
+        }
     }
 
     private Query getQueryById(ObjectId id){

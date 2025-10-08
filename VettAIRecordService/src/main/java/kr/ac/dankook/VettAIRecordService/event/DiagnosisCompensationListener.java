@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class DiagnosisCompensationListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
     public void onRollback(DiagnosisCompensationEvent event) {
-        List<String> ids = event.getIds();
-        storageService.deleteFiles(ids.stream().map(ObjectId::new).toList());
+        String imageId = event.getImageId();
+        storageService.deleteFile(new ObjectId(imageId));
     }
 }

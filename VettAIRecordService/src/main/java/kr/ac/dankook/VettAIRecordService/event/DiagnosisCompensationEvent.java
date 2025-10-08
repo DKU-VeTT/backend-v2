@@ -10,5 +10,5 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class DiagnosisCompensationEvent {
-    private List<String> ids;
+    private String imageId;
 }

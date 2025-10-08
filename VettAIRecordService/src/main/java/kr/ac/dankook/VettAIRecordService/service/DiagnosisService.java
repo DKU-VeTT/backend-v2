@@ -33,11 +33,10 @@ public class DiagnosisService {
     }
 
     @Transactional
-    public void saveDiagnosisEntity(List<String> ids, String memberId, DiagnosisResultRequest data){
+    public void saveDiagnosisEntity(String imageId, String memberId, DiagnosisResultRequest data){
         Diagnosis newDiagnosis = Diagnosis.builder()
                 .memberId(memberId)
-                .originalImageId(ids.get(0))
-                .resultImageId(ids.get(1))
+                .originalImageId(imageId)
                 .diagnosisType(data.getDiagnosisType())
                 .diagnosisResult(data.getDiagnosisResult())
                 .description(data.getDescription())
@@ -45,7 +44,7 @@ public class DiagnosisService {
                 .severityLevel(data.getSeverityLevel())
                 .diseaseName(data.getDiseaseName()).build();
         diagnosisRepository.save(newDiagnosis);
-        eventPublisher.publishEvent(new DiagnosisCompensationEvent(ids));
+        eventPublisher.publishEvent(new DiagnosisCompensationEvent(imageId));
     }
 
     public void deleteDiagnosisEntity(Long id){

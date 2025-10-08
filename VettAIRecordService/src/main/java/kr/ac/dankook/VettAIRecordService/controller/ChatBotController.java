@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/v1/ai/chatbot")
+@RequestMapping("/api/v1/ai/record/chatbot")
 public class ChatBotController {
 
     private final ChatBotHistoryService chatBotHistoryService;
