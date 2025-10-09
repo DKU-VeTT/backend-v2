@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+langchain
+langchain-core
+langchain-community
+langchain-upstage==0.5.0
+langchain-pinecone
+langchain-openai
+python-dotenv
+pymongo
+pytz
+docx2txt
+opencv-python-headless
+numpy
+python-multipart
