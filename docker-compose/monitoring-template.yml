@@ -1,6 +1,7 @@
 version: "3.8"
 
 # docker compose -p monitoring -f ./docker-compose/monitoring-template.yml up -d
+
 services:
   prometheus:
     image: prom/prometheus
@@ -9,13 +10,24 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
     networks:
       - monitoring
+      - shared_network
     deploy:
       resources:
         limits:
           cpus: '0.5'
           memory: 512M
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - monitoring
+      - shared_network
 
   grafana:
     image: grafana/grafana:latest
@@ -30,9 +42,11 @@ services:
     networks:
       - monitoring
       - es_network
+      - shared_network
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0
+    container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -44,6 +58,7 @@ services:
       - es_data:/usr/share/elasticsearch/data
     networks:
       - es_network
+      - shared_network
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.14.0
@@ -58,6 +73,7 @@ services:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
     networks:
       - es_network
+      - shared_network
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.14.0
@@ -70,6 +86,7 @@ services:
       - elasticsearch
     networks:
       - es_network
+      - shared_network
 
 volumes:
   grafana_data:
@@ -79,3 +96,6 @@ volumes:
 networks:
   monitoring:
   es_network:
+  shared_network:
+    name: shared_network
+    external: true

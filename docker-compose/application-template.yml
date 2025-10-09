@@ -1,1 +1,114 @@
+version: "3.8"
+
+# docker network create --driver bridge shared_network -> Create shared Network
 # docker compose -p vett-app -f ./docker-compose/application-template.yml up -d
+
+services:
+  vett-eureka-service:
+    build: ../VettEurekaService
+    container_name: vett-eureka-service
+    ports:
+      - "8761:8761"
+    environment:
+      TZ: Asia/Seoul
+    networks:
+      - vett-app
+      - shared_network
+
+  vett-cloud-gateway-service:
+    build: ../VettCloudGatewayService
+    container_name: vett-cloud-gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: Asia/Seoul
+    depends_on:
+      vett-eureka-service:
+        condition: service_started
+      vett-auth-service:
+        condition: service_started
+      vett-place-service:
+        condition: service_started
+      vett-chat-service:
+        condition: service_started
+      vett-ai-record-service:
+        condition: service_started
+      vett-ai-service:
+        condition: service_started
+    networks:
+      - vett-app
+      - shared_network
+
+  vett-auth-service:
+    build: ../VettAuthService
+    container_name: vett-auth-service
+    ports:
+      - "8081:8081"
+      - "50051:50051"
+    environment:
+      TZ: Asia/Seoul
+    depends_on:
+      vett-eureka-service:
+        condition: service_started
+    networks:
+      - vett-app
+      - shared_network
+
+  vett-place-service:
+    build: ../VettPlaceService
+    container_name: vett-place-service
+    ports:
+      - "8082:8082"
+    environment:
+      TZ: Asia/Seoul
+    depends_on:
+      vett-eureka-service:
+        condition: service_started
+    networks:
+      - vett-app
+      - shared_network
+
+  vett-chat-service:
+    build: ../VettChatService
+    container_name: vett-chat-service
+    ports:
+      - "8083:8083"
+    environment:
+      TZ: Asia/Seoul
+    depends_on:
+      vett-eureka-service:
+        condition: service_started
+    networks:
+      - vett-app
+      - shared_network
+
+  vett-ai-record-service:
+    build: ../VettAIRecordService
+    container_name: vett-ai-record-service
+    ports:
+      - "8084:8084"
+    environment:
+      TZ: Asia/Seoul
+    depends_on:
+      vett-eureka-service:
+        condition: service_started
+    networks:
+      - vett-app
+      - shared_network
+
+  vett-ai-service:
+    build: ../VettAIService
+    container_name: vett-ai-service
+    ports:
+      - "8085:8085"
+    environment:
+      TZ: Asia/Seoul
+    networks:
+      - vett-app
+      - shared_network
+
+networks:
+  vett-app:
+  shared_network:
+    name: shared_network
+    external: true

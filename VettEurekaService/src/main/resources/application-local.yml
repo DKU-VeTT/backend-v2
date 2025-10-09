@@ -2,6 +2,10 @@ spring:
   application:
     name: VettEurekaService
 
+  config:
+    activate:
+      on-profile: local
+
 server:
   port: 8761
 
