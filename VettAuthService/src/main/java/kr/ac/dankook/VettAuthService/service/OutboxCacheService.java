@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MemberOutboxCacheService {
+public class OutboxCacheService {
 
     private final RedisTemplate<String,String> redisTemplate;
 
@@ -22,8 +22,9 @@ public class MemberOutboxCacheService {
     }
 
     public void setOutboxId(String outboxId, long ttl){
-        redisTemplate.opsForValue().set(outboxId, "PUB",ttl, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(outboxId, "PUBLISHED", ttl, TimeUnit.SECONDS);
     }
+
     public void deleteOutboxId(String outboxId){
         redisTemplate.delete(outboxId);
     }

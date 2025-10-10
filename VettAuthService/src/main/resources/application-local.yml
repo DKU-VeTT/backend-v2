@@ -12,10 +12,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      properties:
-        enable:
-          idempotence: true
-
     consumer:
       enable-auto-commit: false
 
@@ -56,6 +52,14 @@ spring:
   grpc:
     server:
       port: ${GRPC_SERVER_PORT}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZINKIN_SERVICE_URL}
 
 eureka:
   client:

@@ -43,3 +43,12 @@ Content-Type: application/json
 ### GET PASSPORT
 GET http://localhost:8081/api/v1/user/passport
 Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwOTY4OTIwLCJrZXkiOiJqOGF0R0ZaRjNjWlBRbnhRVkE3QVBRIiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.pDKLVh6Uo_TNAe8gS-SgEMA0xrxAxvb2RWWm1FtwDTEhfQwjwjizugf5B3ywelzD8IPJgBPs7H5ei3DXQNQ5Hg
+
+### DELETE Member
+DELETE http://localhost:8081/api/v1/user/me
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyNzgiLCJleHAiOjE3NjI2NzQyODQsImtleSI6InJsSHBhcFhJWDZ1T2hVTGpiVWdoSlEiLCJyb2xlIjoi7J2867CYIOyCrOyaqeyekCJ9.fbr7IsggCkWJC2rJXCQRN-n4FkE6Km9WFvj2P8cYNIBhXLkSbjRPhPV8wZ4YVUKo42W5szTV1S4HHn5GqCzzBw
+
+
+
+
+

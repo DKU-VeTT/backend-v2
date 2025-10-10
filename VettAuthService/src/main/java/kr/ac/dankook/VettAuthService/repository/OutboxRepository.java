@@ -1,7 +1,7 @@
 package kr.ac.dankook.VettAuthService.repository;
 
-import kr.ac.dankook.VettAuthService.entity.Outbox;
-import kr.ac.dankook.VettAuthService.entity.OutboxStatus;
+import kr.ac.dankook.VettAuthService.entity.outbox.Outbox;
+import kr.ac.dankook.VettAuthService.entity.outbox.OutboxStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

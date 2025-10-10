@@ -27,7 +27,6 @@ public class Outbox{
     @Column(nullable = false)
     private String payload;
 
-    @Setter
     private String partitionKey;
 
     @Column(nullable = false)
@@ -39,11 +38,12 @@ public class Outbox{
     private OutboxStatus status;
 
     @Builder
-    public Outbox(String id, String eventDomain, String eventType, String payload, OutboxStatus status) {
+    public Outbox(String id, String eventDomain, String eventType, String payload,String partitionKey,OutboxStatus status) {
         this.id = id;
         this.eventDomain = eventDomain;
         this.eventType = eventType;
         this.payload = payload;
+        this.partitionKey = partitionKey;
         this.timestamp = LocalDateTime.now();
         this.status = status;
     }

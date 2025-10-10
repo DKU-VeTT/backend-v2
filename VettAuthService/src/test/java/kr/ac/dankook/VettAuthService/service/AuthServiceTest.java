@@ -64,7 +64,7 @@ public class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.signup(request))
                 .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode",ErrorCode.DUPLICATE_ID);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DUPLICATE_ID);
     }
 
 }

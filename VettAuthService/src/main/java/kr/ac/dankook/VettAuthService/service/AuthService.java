@@ -109,10 +109,12 @@ public class AuthService {
         return createTokenAndSaveInCache(authentication,userId);
     }
 
+
     public void logout(String userId){
         authCacheService.deleteKey(userId);
         SecurityContextHolder.clearContext();
     }
+
 
     private TokenResponse createTokenAndSaveInCache(Authentication authentication,String userId){
         TokenResponse tokens = new TokenResponse(
