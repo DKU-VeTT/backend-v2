@@ -1,4 +1,4 @@
-package kr.ac.dankook.VettAuthService.entity;
+package kr.ac.dankook.VettAuthService.entity.outbox;
 
 public enum OutboxStatus {
     READY_TO_PUBLISH,

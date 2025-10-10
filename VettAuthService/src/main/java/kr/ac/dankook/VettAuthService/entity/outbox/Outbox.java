@@ -1,4 +1,4 @@
-package kr.ac.dankook.VettAuthService.entity;
+package kr.ac.dankook.VettAuthService.entity.outbox;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,29 +14,34 @@ public class Outbox{
     // UUID Random PK
     @Id
     private String id;
-    // Domain : "User"
+    // Domain : "USER"
     @Column(nullable = false)
-    private String domain;
+    private String eventDomain;
 
-    // Type : "UserModified"
+    // Type : "user.event.deleted"
     @Column(nullable = false)
     private String eventType;
 
-    // Payload : "{ key(User PK) : "", eventId : "", userId : "", name : "", email : "" }"
+    // Payload : "{ key : "" ...  }"
     @Lob
     @Column(nullable = false)
     private String payload;
 
+    @Setter
+    private String partitionKey;
+
     @Column(nullable = false)
     private LocalDateTime timestamp;
+
+
 
     @Enumerated(EnumType.STRING)
     private OutboxStatus status;
 
     @Builder
-    public Outbox(String id, String domain, String eventType, String payload, LocalDateTime timestamp, OutboxStatus status) {
+    public Outbox(String id, String eventDomain, String eventType, String payload, OutboxStatus status) {
         this.id = id;
-        this.domain = domain;
+        this.eventDomain = eventDomain;
         this.eventType = eventType;
         this.payload = payload;
         this.timestamp = LocalDateTime.now();

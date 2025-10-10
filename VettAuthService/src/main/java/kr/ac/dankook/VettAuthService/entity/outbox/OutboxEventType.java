@@ -1,4 +1,4 @@
-package kr.ac.dankook.VettAuthService.entity;
+package kr.ac.dankook.VettAuthService.entity.outbox;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,8 @@ import lombok.Getter;
 @Getter
 public enum OutboxEventType {
 
-    USER_CREATED("USER","user.event.created"),
     USER_DELETED("USER","user.event.deleted");
 
-    private final String domain;
+    private final String eventDomain;
     private final String eventType;
 }
