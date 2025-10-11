@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface OutboxRepository extends JpaRepository<Outbox,String> {
-    List<Outbox> findByStatus(OutboxStatus status);
+    List<Outbox> findByStatusIn(List<OutboxStatus> statuses);
 }

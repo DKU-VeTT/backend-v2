@@ -26,7 +26,8 @@ public class OutboxService {
 
     private final OutboxRepository outboxRepository;
     private final ObjectMapper objectMapper;
-    public static final long OUTBOX_TTL = 1000 * 60 * 30;
+    // Outbox ttl 1시간
+    public static final long OUTBOX_TTL = 1000 * 60 * 60;
 
     private String makeOutboxPayload(String eventId, Map<String,String> payloadMap, OutboxEventType outboxEventType){
 

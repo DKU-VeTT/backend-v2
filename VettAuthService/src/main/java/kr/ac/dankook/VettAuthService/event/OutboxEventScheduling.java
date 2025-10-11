@@ -30,12 +30,11 @@ public class OutboxEventScheduling {
     private final EntityManager entityManager;
     private final RetryTemplate retryTemplate;
 
-    @Async
-    @Scheduled(fixedDelay = 60000 * 3) // 3 minute
+    @Scheduled(fixedDelay = 60000 * 5) // 5 minute
     public void retryPublishMessage() {
         log.info("[Auth Service] Start retry publish message. Date : {}", LocalDateTime.now());
 
-        List<Outbox> outboxes = outboxRepository.findByStatus(OutboxStatus.FAILED);
+        List<Outbox> outboxes = outboxRepository.findByStatusIn(List.of(OutboxStatus.READY_TO_PUBLISH,OutboxStatus.FAILED));
         for (Outbox outbox : outboxes) {
             String id = outbox.getId();
             String eventType = outbox.getEventType();
@@ -47,8 +46,8 @@ public class OutboxEventScheduling {
                 return null;
             }, ctx -> {
                 log.error("[Auth Service] Retry exhausted ({} attempts). id={}",ctx.getRetryCount(), id);
-                outboxService.convertOutboxStatus(id, OutboxStatus.PERMANENT_FAILURE);
                 outboxCacheService.deleteOutboxId(id);
+                outboxService.convertOutboxStatus(id, OutboxStatus.PERMANENT_FAILURE);
                 return null;
             });
         }
@@ -58,7 +57,7 @@ public class OutboxEventScheduling {
     @Transactional
     public void removePublishedEvents(){
         log.info("[Auth Service] Remove all published events. Date - {}",LocalDateTime.now());
-        List<Outbox> outboxes = outboxRepository.findByStatus(OutboxStatus.PUBLISHED);
+        List<Outbox> outboxes = outboxRepository.findByStatusIn(List.of(OutboxStatus.PUBLISHED));
         Set<String> outboxIds = outboxes.stream().map(Outbox::getId).collect(Collectors.toSet());
         entityManager.flush();
         outboxRepository.deleteAllInBatch(outboxes);
