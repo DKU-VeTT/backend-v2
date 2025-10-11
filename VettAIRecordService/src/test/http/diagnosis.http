@@ -2,15 +2,6 @@
 GET http://localhost:8080/api/v1/ai/diagnosis
 Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyNzgiLCJleHAiOjE3NjE0OTUwNzUsImtleSI6IjZQdWw4TmQ4TW52aEdxbzlFS3phVlEiLCJyb2xlIjoi7J2867CYIOyCrOyaqeyekCJ9.CZo74jPtIPtwg2El86QiA5nSoJL4fbQnaHTkkZLYiJT685ICmdy_C237QBO-z3uVt-7Ov8Xn_onEgHKyX_bWNw
 
-#{
-#  "diagnosisType": "SKIN",
-#  "description": "왼쪽 다리 병변",
-#  "diseaseName": "결절/종양",
-#  "severityLevel": "VERY_HIGH",
-#  "confidenceScore": 0.62,
-#  "diagnosisResult": "모델 예측: 보통 수준 의심. 추가 검토 권장."
-#}
-
 ### DELETE Diagnosis
 DELETE http://localhost:8080/api/v1/ai/diagnosis/qwesadzxc12qwe
 Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyNzgiLCJleHAiOjE3NjE0OTUwNzUsImtleSI6IjZQdWw4TmQ4TW52aEdxbzlFS3phVlEiLCJyb2xlIjoi7J2867CYIOyCrOyaqeyekCJ9.CZo74jPtIPtwg2El86QiA5nSoJL4fbQnaHTkkZLYiJT685ICmdy_C237QBO-z3uVt-7Ov8Xn_onEgHKyX_bWNw
