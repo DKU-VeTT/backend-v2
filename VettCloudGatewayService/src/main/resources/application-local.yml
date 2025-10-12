@@ -23,22 +23,20 @@ spring:
               uri: lb://VETT-PLACE-SERVICE
               predicates:
                 - Path=/api/v1/places/**
-            - id: vett-chatbot-service
-              uri: lb://VETT-CHATBOT-SERVICE
-              predicates:
-                - Path=/api/v1/chatbot/**
-            - id: vett-chatRoom-service
-              uri: lb://VETT-CHATROOM-SERVICE
-              predicates:
-                - Path=/api/v1/chatRooms/**
             - id: vett-chat-service
               uri: lb://VETT-CHAT-SERVICE
               predicates:
-                - Path=/api/v1/chat/**, /sub/**, /ws, /pub/**
-            - id: vett-diagnosis-service
-              uri: lb://VETT-DIAGNOSIS-SERVICE
+                - Path=/api/v1/chatRooms/**, /api/v1/chat/**, /sub/**, /ws, /pub/**
+            - id: vett-ai-record-service
+              uri: lb://VETT-AI-RECORD-SERVICE
               predicates:
-                - Path=/api/v1/diagnosis/**
+                - Path=/api/v1/ai/record/**
+            - id: vett-ai-service
+              uri: http://127.0.0.1:8085
+              predicates:
+                - Path=/api/v1/ai/**
+
+          default-filters: DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
 
 resilience4j:
   circuitbreaker:
@@ -67,6 +65,12 @@ management:
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZINKIN_SERVICE_URL}
 
 eureka:
   client:
@@ -78,6 +82,9 @@ eureka:
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME}
 
+logstash:
+  host: ${LOGSTASH_HOST}
+
 app:
   domain:
     client:
@@ -85,7 +92,6 @@ app:
     auth-service:
       grpc-port: ${APP_AUTH_SERVICE_GRPC_PORT}
       grpc-host: ${APP_AUTH_SERVICE_GRPC_HOST}
-
 
   secret:
     jwt : ${APP_JWT_SECRET}

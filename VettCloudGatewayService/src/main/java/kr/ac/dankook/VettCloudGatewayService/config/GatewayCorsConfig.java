@@ -12,12 +12,12 @@ import java.util.List;
 public class GatewayCorsConfig {
 
     @Value("${app.domain.client.local}")
-    private String CLIENT_LOCAL_DOMAIN;
+    private String LOCAL_FRONT_ADDRESS;
 
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(CLIENT_LOCAL_DOMAIN));
+        config.setAllowedOrigins(List.of(LOCAL_FRONT_ADDRESS));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

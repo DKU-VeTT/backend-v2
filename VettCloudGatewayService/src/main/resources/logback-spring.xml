@@ -1,5 +1,7 @@
 <configuration scan="true">
     <conversionRule conversionWord="clr" class="org.springframework.boot.logging.logback.ColorConverter" />
+
+    <springProperty scope="context" name="LOGSTASH_HOST" source="logstash.host"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%clr([%d{yyyyMMdd HH:mm:ss.SSS}]){magenta} %clr([%-5level]) [%thread] %clr(%logger){cyan} %msg%n</pattern>
@@ -7,7 +9,7 @@
     </appender>
 
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>localhost:5000</destination>
+        <destination>${LOGSTASH_HOST}:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <includeMdc>false</includeMdc>
             <customFields>{"service":"gateway service","env":"dev"}</customFields>

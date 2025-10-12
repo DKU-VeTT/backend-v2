@@ -34,8 +34,12 @@ public class PassportFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
+        String path = exchange.getRequest().getURI().getPath();
+        if (path.startsWith("/api/v1/auth") || path.startsWith("/actuator") || path.startsWith("/ws") ||
+                path.startsWith("/pub") || path.startsWith("/sub")){
+            return chain.filter(exchange);
+        }
         String key = exchange.getAttribute("key");
-
         Passport.PassportResponse passport = passportGrpcService.getPassportInfo(key);
         if (passport == null) throw new CustomException(ErrorCode.PASSPORT_ERROR);
 
