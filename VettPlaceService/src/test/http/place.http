@@ -12,7 +12,7 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyI
 
 ### GET Place by dist
 GET http://localhost:8080/api/v1/places/dist?latitude=37.290751248&longitude=126.993343392&category=HOSPITAL
-Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwOTY4OTIwLCJrZXkiOiJqOGF0R0ZaRjNjWlBRbnhRVkE3QVBRIiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.pDKLVh6Uo_TNAe8gS-SgEMA0xrxAxvb2RWWm1FtwDTEhfQwjwjizugf5B3ywelzD8IPJgBPs7H5ei3DXQNQ5Hg
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyNzgiLCJleHAiOjE3NjI2NjQ1MDcsImtleSI6IjZQdWw4TmQ4TW52aEdxbzlFS3phVlEiLCJyb2xlIjoi7J2867CYIOyCrOyaqeyekCJ9.Ndl500aS_MXobBh5GxMyb8q34pCfFVNGIB4vwtoVUxiRoLT7JgYVMdoZTOrFjWe8-1iK50zQ-1P31Hv6-oXKnw
 
 ### GET Place by filter
 GET http://localhost:8080/api/v1/places/filter?category=PHARMACY&isParking=true&isOpen=true&region=경기도

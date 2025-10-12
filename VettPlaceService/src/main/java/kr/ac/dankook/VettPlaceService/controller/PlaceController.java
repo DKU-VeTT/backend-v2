@@ -4,12 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.ac.dankook.VettPlaceService.dto.response.ApiResponse;
 import kr.ac.dankook.VettPlaceService.dto.response.PlaceDistResponse;
 import kr.ac.dankook.VettPlaceService.dto.response.PlaceResponse;
-import kr.ac.dankook.VettPlaceService.entity.Passport;
 import kr.ac.dankook.VettPlaceService.entity.PlaceCategory;
 import kr.ac.dankook.VettPlaceService.service.PlaceCacheService;
 import kr.ac.dankook.VettPlaceService.service.PlaceService;
-import kr.ac.dankook.VettPlaceService.util.AccessControl;
-import kr.ac.dankook.VettPlaceService.util.PassportMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -54,11 +51,12 @@ public class PlaceController {
     @GetMapping("/dist")
     public ResponseEntity<ApiResponse<List<PlaceDistResponse>>> getVetPlaceByDist(
             @RequestParam(value = "category", required = false) PlaceCategory category,
+            @RequestParam(value= "isOpen", required = false) boolean isOpen,
             @RequestParam(value = "latitude") double latitude,
             @RequestParam(value = "longitude") double longitude
     ){
         return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
-                placeService.getPlaceOrderByDist(category, latitude, longitude)));
+                placeService.getPlaceOrderByDist(category, isOpen, latitude, longitude)));
     }
 
     @GetMapping("/filter")

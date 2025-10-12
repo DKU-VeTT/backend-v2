@@ -50,7 +50,7 @@ public class PlaceService {
                         .convertToPlaceResponse(item,false)).toList();
     }
 
-    public List<PlaceDistResponse> getPlaceOrderByDist(PlaceCategory category, double desLatitude, double desLongitude) {
+    public List<PlaceDistResponse> getPlaceOrderByDist(PlaceCategory category,boolean isOpen, double desLatitude, double desLongitude) {
 
         String cat = category == null ? null : category.name();
         List<Object[]> rows = placeRepository.findNearestPlaceIds(cat, desLatitude, desLongitude, 10.0);
@@ -64,6 +64,7 @@ public class PlaceService {
         List<Place> places = placeRepository.findPlacesByIdsWithFetchJoin(ids);
 
         return places.stream()
+                .filter(place -> !isOpen || DateUtil.isOpenNow(place.getOperatingHours()))
                 .map(place -> {
                     double distance = distanceMap.get(place.getId());
                     String distStr = distance >= 1
