@@ -6,28 +6,27 @@ import kr.ac.dankook.VettCloudGatewayService.error.CustomException;
 import kr.ac.dankook.VettCloudGatewayService.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.grpc.server.service.GrpcService;
 import java.util.concurrent.TimeUnit;
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 @Slf4j
 public class PassportGrpcService {
 
     private final PassportServiceGrpc.PassportServiceBlockingStub passportServiceStub;
 
+
     @CircuitBreaker(name = "passport", fallbackMethod = "getPassportFallback")
     public Passport.PassportResponse getPassportInfo(String userKey) {
+
         Passport.PassportRequest request = Passport.PassportRequest.newBuilder()
                 .setKey(userKey)
                 .build();
-        try{
-            return passportServiceStub
-                    .withDeadlineAfter(400,TimeUnit.MILLISECONDS)
-                    .getPassport(request);
-        }catch (Exception e){
-           return null;
-        }
+
+        return passportServiceStub
+                .withDeadlineAfter(400,TimeUnit.MILLISECONDS)
+                .getPassport(request);
     }
 
     public Passport.PassportResponse getPassportFallback(String userKey, Throwable t) {

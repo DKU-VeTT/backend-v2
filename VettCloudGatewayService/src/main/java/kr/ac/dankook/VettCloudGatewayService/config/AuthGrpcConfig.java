@@ -1,5 +1,8 @@
 package kr.ac.dankook.VettCloudGatewayService.config;
 
+import brave.Tracing;
+import brave.grpc.GrpcTracing;
+import io.grpc.ClientInterceptor;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import kr.ac.dankook.PassportServiceGrpc;
@@ -15,13 +18,18 @@ public class AuthGrpcConfig {
     private final PassportServiceGrpc.PassportServiceBlockingStub stub;
 
     public AuthGrpcConfig(@Value("${app.domain.auth-service.grpc-port}") int port,
-                          @Value("${app.domain.auth-service.grpc-host}") String grpcHost) {
+                          @Value("${app.domain.auth-service.grpc-host}") String grpcHost,
+                          Tracing tracing) {
+
+        GrpcTracing grpcTracing = GrpcTracing.create(tracing);
+        ClientInterceptor clientInterceptor = grpcTracing.newClientInterceptor();
 
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress(grpcHost, port)
                 .usePlaintext()
                 .build();
-        stub = PassportServiceGrpc.newBlockingStub(channel);
+        stub = PassportServiceGrpc.newBlockingStub(channel)
+                .withInterceptors(clientInterceptor);
     }
 
     @Bean

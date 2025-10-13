@@ -42,11 +42,20 @@ resilience4j:
   circuitbreaker:
     instances:
       passport:
+        # spring /actuator/health 서킷 브레이커 상태 노출
         register-health-indicator: true
+        # 실패율을 계산할 때 쓰는 윈도우 크기 -> 최근 10건 호출을 기준으로 실패율 계산
         sliding-window-size: 10
+        # 실패율 임계치 : 실패가 50% 이상이면 OPEN(차단) 상태로 전환
         failure-rate-threshold: 50
+        # OPEN 유지 시간 : 차단된 뒤 10초 동안은 외부 호출을 차단하고 바로 실패 반환.
+        # 10초가 지나면 HALF_OPEN 으로 전환
         wait-duration-in-open-state: 10000ms
+        # HALF_OPEN 상태에서 3건의 실제 호출만 통과시켜서 상태를 재평가
+        # 3건의 임계치가 실패율 50%를 넘지 않으면 CLOSED로 복구
+        # 넘으면 다시 OPEN
         permitted-number-of-calls-in-half-open-state: 3
+        # 서킷 브레이커 이벤트를 내부 버퍼에 최대 10개까지 보관
         event-consumer-buffer-size: 10
 
 
@@ -61,13 +70,18 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,metrics,info,prometheus"
+        include: "health,metrics,info,prometheus,circuitbreakerevents"
   endpoint:
     health:
       show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
   tracing:
     sampling:
       probability: 1.0
+    propagation:
+      type: b3, w3c
   zipkin:
     tracing:
       endpoint: ${ZINKIN_SERVICE_URL}
