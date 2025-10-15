@@ -5,9 +5,13 @@ spring:
   config:
     activate:
       on-profile: local
+    import: optional:file:.env[.properties]
 
 server:
   port: 8761
+
+logstash:
+  host: ${LOGSTASH_HOST}
 
 eureka:
   client:
