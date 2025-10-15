@@ -9,6 +9,8 @@ spring:
 
   main:
     web-application-type: reactive
+  reactor:
+    context-propagation: auto
 
   cloud:
     gateway:
@@ -37,6 +39,9 @@ spring:
                 - Path=/api/v1/ai/**
 
           default-filters: DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+          observability:
+            enabled: true
+
 
 resilience4j:
   circuitbreaker:
@@ -70,21 +75,20 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,metrics,info,prometheus,circuitbreakerevents"
+        include: "health,metrics,info,prometheus"
   endpoint:
     health:
       show-details: always
-  health:
-    circuitbreakers:
-      enabled: true
+
   tracing:
     sampling:
       probability: 1.0
     propagation:
-      type: b3, w3c
+      consume: b3
+      produce: b3_multi
   zipkin:
     tracing:
-      endpoint: ${ZINKIN_SERVICE_URL}
+      endpoint: ${ZIPKIN_SERVICE_URL}
 
 eureka:
   client:

@@ -27,9 +27,10 @@ public class AuthGrpcConfig {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress(grpcHost, port)
                 .usePlaintext()
+                .intercept(clientInterceptor)
                 .build();
-        stub = PassportServiceGrpc.newBlockingStub(channel)
-                .withInterceptors(clientInterceptor);
+
+        stub = PassportServiceGrpc.newBlockingStub(channel);
     }
 
     @Bean

@@ -41,7 +41,9 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
             DataBuffer buffer = response.bufferFactory().wrap(bytes);
             return response.writeWith(Mono.just(buffer));
         } catch (Exception e) {
-            log.error("Error serializing error response", e);
+            log.error(
+                    "[error_response_serialization_failed, component={}, error={}]",
+                    "GatewayErrorHandler",  e.getMessage());
             byte[] bytes = e.getMessage()
                     .getBytes(StandardCharsets.UTF_8);
             DataBuffer buffer = response.bufferFactory().wrap(bytes);

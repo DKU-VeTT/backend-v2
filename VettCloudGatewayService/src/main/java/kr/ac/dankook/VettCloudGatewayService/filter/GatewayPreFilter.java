@@ -18,7 +18,9 @@ public class GatewayPreFilter implements GlobalFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         ServerHttpRequest request = exchange.getRequest();
-        log.info("Pre Filter : Request URI is - {}", request.getURI().getPath());
+        log.info(
+                "[gateway_request_uri, component={}, URI={}]",
+                "GatewayPreFilter", request.getURI().getPath());
         return chain.filter(exchange);
     }
 

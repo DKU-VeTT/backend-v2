@@ -60,7 +60,9 @@ public class PassportFilter implements GlobalFilter {
                     httpHeaders.add("X-Passport", encodedPayload);
                 })
                 .build();
-
+        log.info(
+                "[success_gateway_passport, component={}, userKey={}]",
+                "GatewayPassportFilter", key);
         ServerWebExchange mutatedExchange = exchange.mutate()
                 .request(mutatedRequest)
                 .build();

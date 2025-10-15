@@ -30,7 +30,9 @@ public class PassportGrpcService {
     }
 
     public Passport.PassportResponse getPassportFallback(String userKey, Throwable t) {
-        log.error("Fallback called for passport userKey: {} due to: {}", userKey, t.getMessage());
-        throw new CustomException(ErrorCode.PASSPORT_ERROR);
+        log.error(
+                "[fallback_called_passport_grpc, component={}, userKey={}, error={}]",
+                "GatewayPassportService",userKey,t.getMessage());
+     throw new CustomException(ErrorCode.PASSPORT_ERROR);
     }
 }
