@@ -2,7 +2,6 @@ package kr.ac.dankook.VettPlaceService.dto.response;
 
 import kr.ac.dankook.VettPlaceService.entity.Bookmark;
 import kr.ac.dankook.VettPlaceService.util.converter.PlaceEntityConverter;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

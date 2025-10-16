@@ -5,6 +5,7 @@ import kr.ac.dankook.VettPlaceService.dto.response.ApiResponse;
 import kr.ac.dankook.VettPlaceService.dto.response.BookmarkResponse;
 import kr.ac.dankook.VettPlaceService.entity.Passport;
 import kr.ac.dankook.VettPlaceService.service.BookmarkService;
+import kr.ac.dankook.VettPlaceService.service.IdempotencyService;
 import kr.ac.dankook.VettPlaceService.util.PassportMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +18,21 @@ import java.util.List;
 public class BookmarkController {
 
     private final BookmarkService bookmarkService;
+    private final IdempotencyService idempotencyService;
 
     @PostMapping("/{placeId}")
-    public ResponseEntity<ApiMessageResponse> addBookmark(@PassportMember Passport passport, @PathVariable Long placeId){
+    public ResponseEntity<ApiMessageResponse> addBookmark(
+            @PassportMember Passport passport,
+            @RequestHeader("Idempotency-Key") String key,
+            @PathVariable Long placeId){
+         String res = idempotencyService.execute(
+                key,
+                () -> bookmarkService.saveBookmark(placeId,passport.getKey()),
+                 String.class
+        );
         bookmarkService.saveBookmark(placeId,passport.getKey());
         return ResponseEntity.status(201).body(new ApiMessageResponse(true,201,
-                "즐겨찾기 등록에 성공하였습니다."));
+                res));
     }
 
     @DeleteMapping("/{bookmarkId}")

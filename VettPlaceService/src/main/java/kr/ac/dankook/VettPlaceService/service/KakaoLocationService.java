@@ -67,20 +67,16 @@ public class KakaoLocationService {
                     .desLongitude(desLongitude).desLatitude(desLatitude)
                     .taxiFare(taxiFare).tollFare(tollFare).distance(distance).time(duration).build();
         }catch(JSONException e){
-            log.error("Error occurred during parsing route info - stat {} {} / des {} {}",statLatitude,statLongitude,desLatitude,desLongitude);
-            throw new ExternalApiException("좌표 형식이 올바르지 않아 교통 정보를 받아올 수 없습니다. 다시 시도해주세요.");
+           throw new ExternalApiException("좌표 형식이 올바르지 않아 교통 정보를 받아올 수 없습니다. 다시 시도해주세요.", e.getMessage());
         }catch (Exception e){
-            log.error("Error occurred during call kakao navi api - {}",e.getMessage());
-
             String jsonPart = e.getMessage().split(": ", 2)[1];
             jsonPart = jsonPart.replaceAll("^\"|\"$", "");
             JSONObject errorObject = new JSONObject(jsonPart);
 
             int errorCode = errorObject.getInt("code");
             String errorMsg = errorObject.getString("msg");
-            if (errorCode == -2) throw new ExternalApiException(errorMsg);
-
-            throw new ExternalApiException("외부 호출에 문제가 생겼습니다. 나중에 다시 시도해주세요.");
+            if (errorCode == -2) throw new ExternalApiException(errorMsg, e.getMessage());
+            throw new ExternalApiException("외부 호출에 문제가 생겼습니다. 나중에 다시 시도해주세요.",  e.getMessage());
         }
     }
     public CoordinateResponse getCoordinateByAddress(String address){
@@ -106,11 +102,9 @@ public class KakaoLocationService {
             return CoordinateResponse.builder()
                     .latitude(latitude).longitude(longitude).build();
         } catch (JSONException e) {
-            log.error("Error occurred during parsing address - {}",address);
-            throw new ExternalApiException("주소 형식이 올바르지 않습니다. 다시 시도해주세요.");
+            throw new ExternalApiException("주소 형식이 올바르지 않습니다. 다시 시도해주세요.", e.getMessage());
         } catch (Exception e){
-            log.error("Error occurred during call kakao api - {}",e.getMessage());
-            throw new ExternalApiException("외부 호출에 문제가 생겼습니다. 나중에 다시 시도해주세요.");
+            throw new ExternalApiException("외부 호출에 문제가 생겼습니다. 나중에 다시 시도해주세요.", e.getMessage());
         }
     }
 }

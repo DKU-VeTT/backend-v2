@@ -4,7 +4,7 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyI
 
 ### GET One Place by cache
 GET http://localhost:8080/api/v1/places/1
-Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzYwOTY4OTIwLCJrZXkiOiJqOGF0R0ZaRjNjWlBRbnhRVkE3QVBRIiwicm9sZSI6IuydvOuwmCDsgqzsmqnsnpAifQ.pDKLVh6Uo_TNAe8gS-SgEMA0xrxAxvb2RWWm1FtwDTEhfQwjwjizugf5B3ywelzD8IPJgBPs7H5ei3DXQNQ5Hg
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyNzgiLCJleHAiOjE3NjI5Mjc0NzEsImtleSI6InJsSHBhcFhJWDZ1T2hVTGpiVWdoSlEiLCJyb2xlIjoi7J2867CYIOyCrOyaqeyekCJ9.o0i6E9jaYSSX7lkQzzRezMOP1ggESm-gtzp9E5W0tKzTczbaPYwGJV3wV2-0rTYgd1WdjzcLAvqy5L40-9ylbQ
 
 ### GET Place by keyword
 GET http://localhost:8080/api/v1/places/search?keyword=1번

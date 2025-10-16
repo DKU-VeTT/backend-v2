@@ -1,0 +1,53 @@
+<configuration scan="true">
+    <conversionRule conversionWord="clr" class="org.springframework.boot.logging.logback.ColorConverter" />
+
+    <springProperty scope="context" name="LOGSTASH_HOST" source="logstash.host"/>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%clr([%d{yyyy-MM-dd HH:mm:ss.SSS}]){magenta} %clr([%-5level]) [Place Service] [%thread Thread] %clr(%logger{36}){cyan} [trace=%X{traceId}, span=%X{spanId}] %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LOGSTASH_ALL" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${LOGSTASH_HOST}:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdc>true</includeMdc>
+            <customFields>{ "service":"Place" }</customFields>
+        </encoder>
+        <keepAliveDuration>5 minutes</keepAliveDuration>
+        <reconnectionDelay>3 seconds</reconnectionDelay>
+    </appender>
+
+    <appender name="LOGSTASH_WARN" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${LOGSTASH_HOST}:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdc>true</includeMdc>
+            <customFields>{ "service":"Place" }</customFields>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <keepAliveDuration>5 minutes</keepAliveDuration>
+        <reconnectionDelay>3 seconds</reconnectionDelay>
+    </appender>
+
+    <logger name="kr.ac.dankook" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH_ALL"/>
+    </logger>
+
+    <logger name="org.springframework" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH_WARN"/>
+    </logger>
+
+    <logger name="org.hibernate" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH_WARN"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH_WARN"/>
+    </root>
+</configuration>

@@ -14,6 +14,9 @@ public enum ErrorCode {
     ACCESS_DENIED(HttpStatus.FORBIDDEN,"P001","접근 권한이 존재하지 않습니다."),
     // 즐겨찾기 등록 에러
     ALREADY_ADD_BOOKMARK(HttpStatus.BAD_REQUEST,"B001","이미 즐겨찾기에 등록되어있습니다."),
+    // Idempotency 전용 에러
+    IDEMPOTENCY_KEY_REQUIRED(HttpStatus.BAD_REQUEST, "I001", "Idempotency-Key 헤더가 누락되었습니다."),
+    IDEMPOTENCY_IN_PROGRESS_CONFLICT(HttpStatus.CONFLICT, "I002", "요청이 처리 중입니다."),
     // 입력값 검증 에러
     INVALID_ENCRYPT_PK(HttpStatus.BAD_REQUEST,"V001", "유효하지 않은 데이터 아이디 형식입니다."),
     INVALID_REQUEST_PARAM(HttpStatus.BAD_REQUEST,"V002","필수 입력 항목이 누락되었습니다."),
