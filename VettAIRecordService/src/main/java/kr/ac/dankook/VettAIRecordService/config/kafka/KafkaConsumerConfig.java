@@ -17,11 +17,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
-import org.springframework.kafka.listener.ListenerExecutionFailedException;
 import org.springframework.kafka.support.ExponentialBackOffWithMaxRetries;
 import org.springframework.kafka.support.serializer.DeserializationException;
-import org.springframework.messaging.converter.MessageConversionException;
-
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +37,11 @@ public class KafkaConsumerConfig {
     @Bean
     public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(){
         return new DeadLetterPublishingRecoverer(kafkaTemplate,
-                (record,ex) -> new TopicPartition(record.topic()+DLT_SUFFIX,record.partition()));
+                (record,ex) -> {
+                    record.headers().add("error-class", ex.getClass().getName().getBytes(StandardCharsets.UTF_8));
+                    record.headers().add("error-message",ex.getMessage().getBytes(StandardCharsets.UTF_8));
+                    return new TopicPartition(record.topic()+DLT_SUFFIX,record.partition());
+                });
     }
 
     @Bean
@@ -79,6 +81,7 @@ public class KafkaConsumerConfig {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        factory.getContainerProperties().setObservationEnabled(true);
         factory.setCommonErrorHandler(errorHandler);
 
         return factory;

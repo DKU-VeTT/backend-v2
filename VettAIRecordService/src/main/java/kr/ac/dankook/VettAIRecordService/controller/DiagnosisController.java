@@ -10,6 +10,7 @@ import kr.ac.dankook.VettAIRecordService.error.ErrorCode;
 import kr.ac.dankook.VettAIRecordService.error.exception.CustomException;
 import kr.ac.dankook.VettAIRecordService.facade.DiagnosisFacade;
 import kr.ac.dankook.VettAIRecordService.service.DiagnosisService;
+import kr.ac.dankook.VettAIRecordService.service.IdempotencyService;
 import kr.ac.dankook.VettAIRecordService.service.StorageService;
 import kr.ac.dankook.VettAIRecordService.util.DecryptId;
 import kr.ac.dankook.VettAIRecordService.util.PassportMember;
@@ -22,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.Duration;
 import java.util.List;
 
@@ -35,19 +35,26 @@ public class DiagnosisController {
     private final DiagnosisFacade diagnosisFacade;
     private final DiagnosisService diagnosisService;
     private final StorageService storageService;
+    private final IdempotencyService idempotencyService;
 
     @PostMapping
     public ResponseEntity<ApiMessageResponse> saveDiagnosisResult(
             @RequestPart("file") MultipartFile file,
             @RequestPart("data") @Valid DiagnosisResultRequest data,
+            @RequestHeader("Idempotency-Key") String key,
             @PassportMember Passport passport
     ){
         if (file == null){
             throw new CustomException(ErrorCode.INVALID_REQUEST_PARAM);
         }
-         diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey());
+        String res = idempotencyService.execute(
+                key,
+                () -> diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey()),
+                String.class
+        );
+        diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey());
         return ResponseEntity.status(201).body(new ApiMessageResponse(true,201,
-                 "진단 결과를 성공적으로 저장 완료하였습니다."));
+                res));
     }
 
     @DeleteMapping("/{id}")

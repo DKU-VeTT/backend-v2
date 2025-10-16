@@ -12,8 +12,12 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      observation-enabled: true
     consumer:
       enable-auto-commit: false
+    template:
+      observation-enabled: true
 
   jpa:
     hibernate:
@@ -47,6 +51,20 @@ eureka:
       defaultZone: ${EUREKA_SERVICE_URL}
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      consume: b3
+      produce: b3_multi
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_SERVICE_URL}
+
+logstash:
+  host: ${LOGSTASH_HOST}
 
 server:
   port: 8084

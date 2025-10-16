@@ -11,9 +11,6 @@ import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,8 +28,9 @@ public class StorageService {
                     .store(in, file.getOriginalFilename(), contentType, meta)
                     .toHexString();
         } catch (Exception e) {
-            log.error("Error during upload file. name={}, type={}, ex={}",
-                    file.getOriginalFilename(), file.getContentType(), e.toString());
+            log.error(
+                    "[upload_file_error, component={}, fileName={}, type={}, error={}]",
+                    "StorageService",file.getOriginalFilename(), file.getContentType(), e.getMessage());
             throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
         }
     }
@@ -46,7 +44,9 @@ public class StorageService {
         try{
             gridFsTemplate.delete(getQueryById(id));
         }catch (Exception e){
-            log.error("Delete file failed. id={}, ex={}", id.toHexString(), e.getMessage());
+            log.error(
+                    "[delete_file_error, component={}, id={}, error={}]",
+                    "StorageService",id.toHexString(), e.getMessage());
         }
     }
 

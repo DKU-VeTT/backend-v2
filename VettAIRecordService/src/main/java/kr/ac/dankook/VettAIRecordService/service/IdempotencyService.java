@@ -23,48 +23,46 @@ public class IdempotencyService{
     private static final long RESULT_TTL = 1000 * 60 * 15; // 15 minutes
 
     // 동일 idem Key로 두 번 호출 -> 캐시 응답으로 반환 ( 중복 요청 제거 및 멱등성 보장 )
-    // 같은 idem Key지만 다른 bodyHash -> 422
     // idem key가 없는 경우 400
     @SuppressWarnings({"ConstantConditions"})
-    public <T> T execute(String key, String bodyHash, Supplier<T> action,Class<T> tClass){
+    public <T> T execute(String key, Supplier<T> action,Class<T> tClass){
 
+        // Idem Key가 없는 경우
         if (key == null || key.isBlank()){
             throw new CustomException(ErrorCode.IDEMPOTENCY_KEY_REQUIRED);
         }
         String stateKey = "idem:" + key  + ":state";
-        String hashKey = "idem:" + key  + ":hash";
         String respKey = "idem:" + key + ":resp";
 
-        String prevHash = redisTemplate.opsForValue().get(hashKey);
-
-        if (prevHash != null && !prevHash.equals(bodyHash)){
-            throw new CustomException(ErrorCode.IDEMPOTENCY_BODY_MISMATCH);
-        }
-
+        // 1) state key를 통해 lock 획득
         boolean locked = redisTemplate.opsForValue().setIfAbsent(stateKey,"processing", PROCESSING_TTL, TimeUnit.MILLISECONDS);
         if (!locked){
+            // 2) 이미 누군가 처리 중 / 완료 -> 응답 캐시가 있으면 즉시 반환
             String cached = redisTemplate.opsForValue().get(respKey);
             if (cached != null){
                 try{
                     return objectMapper.readValue(cached, tClass);
                 }catch (JsonProcessingException e){
-                    throw new CustomException(ErrorCode.IDEMPOTENCY_IN_PROGRESS_CONFLICT);
+                    throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
                 }
             }
+            // lock을 얻지 못하고 ( 충돌 상황 ) & cache 값도 없는 상황 or 다른 요청을 통해 처리중인 상황
             throw new CustomException(ErrorCode.IDEMPOTENCY_IN_PROGRESS_CONFLICT);
         }
+
         try{
-            if (prevHash == null){
-                redisTemplate.opsForValue().set(hashKey,bodyHash,RESULT_TTL,TimeUnit.MILLISECONDS);
-            }
             T result = action.get();
             String jsonResult = objectMapper.writeValueAsString(result);
-            redisTemplate.opsForValue().set(respKey,jsonResult,RESULT_TTL, TimeUnit.MILLISECONDS);
-            redisTemplate.opsForValue().set(stateKey,"done",RESULT_TTL,TimeUnit.MILLISECONDS);
+            // state key와 결과 값을 저장
+            redisTemplate.opsForValue().set(respKey,jsonResult, RESULT_TTL, TimeUnit.MILLISECONDS);
+            redisTemplate.opsForValue().set(stateKey,"done", RESULT_TTL,TimeUnit.MILLISECONDS);
             return result;
         }catch (JsonProcessingException e){
             redisTemplate.delete(stateKey);
             throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+        }catch (Throwable t){
+            redisTemplate.delete(stateKey);
+            throw t;
         }
     }
 }

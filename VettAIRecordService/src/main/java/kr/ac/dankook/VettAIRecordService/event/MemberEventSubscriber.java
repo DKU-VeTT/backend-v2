@@ -48,18 +48,22 @@ public class MemberEventSubscriber {
         String id = event.getId();
         // 현재 Id로 이미 실행된 이벤트가 있는지 확인
         if (eventRecordRepository.findById(id).isPresent()){
-            log.info("[AI RecordService] [Kafka Event Listener] Duplicate event {} -> ack only", id);
+            log.info(
+                    "[member_event_duplicated_send_ack_only, component={}, eventId={}]",
+                    "MemberEventSubscriber", id);
             ack.acknowledge();
             return;
         }
         // Upsert를 통해 행 삽입. PK 중복방지 + jpa id 수동 지정으로 인한 추가 Select 방지.
         // @Transactional로 인해 만약 비즈니스 로직 실패 시 해당 Record도 롤백되므로 재시도 가능 -> 중복 방지에 안걸리고 재시도 검증 완료
         // 따라서 현재 DB에 있는 레코드는 모두 해당 비즈니스 로직 성공이 완료되었음을 보장하게 된다. ( 아래 상황은 제외 )
-        // -> Insert를 한 후 비즈니스 로직이 실행 완료 되어 커밋전까지는 제외 -> 이때는 레코드가 DB에 남아있지만 로직이 실행중이므로 완료 보장은 아니다.
+        // -> Insert를 한 후 비즈니스 로직이 실행 완료 되어 커밋이 되기 까지는 제외 -> 이때는 레코드가 DB에 남아있지만 로직이 실행중이므로 완료 보장은 아니다.
         // 따라서 timestamp 기반으로 스케쥴러에서 해당 레코드를 삭제해야한다.
         eventRecordRepository.upsert(id);
 
-        log.info("[AI RecordService] [Kafka Event Listener] topic {}, partitionKey {}, payload - {}", topic, partitionKey, payload);
+        log.info(
+                "[member_event_listened, component={}, topic={}, partitionKey={}, payload={}]",
+                "MemberEventSubscriber", topic, partitionKey, payload);
         // 비즈니스 로직
         String ownerId = (String) event.getPayload().get("userKey");
         List<ChatBotRoom> chatBotRooms = chatBotRoomRepository.findChatBotRoomByOwnerId(ownerId);
@@ -67,7 +71,6 @@ public class MemberEventSubscriber {
 
         List<Diagnosis> diagnoses = diagnosisRepository.findByMemberId(ownerId);
         diagnoses.forEach(i -> diagnosisFacade.deleteDiagnosisResult(i.getId()));
-
         ack.acknowledge();
     }
 }

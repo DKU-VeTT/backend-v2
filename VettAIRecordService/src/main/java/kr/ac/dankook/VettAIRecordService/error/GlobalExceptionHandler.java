@@ -1,5 +1,6 @@
 package kr.ac.dankook.VettAIRecordService.error;
 
+import jakarta.servlet.http.HttpServletRequest;
 import kr.ac.dankook.VettAIRecordService.error.exception.CustomException;
 import kr.ac.dankook.VettAIRecordService.error.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,39 +21,54 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException e, HttpServletRequest req) {
+
         ErrorCode errorCode = e.getErrorCode();
+        log.error(
+                "[custom_exception, component={}, uri={}, error={}]",
+                "GlobalExceptionHandler",req.getRequestURI(),e.getMessage());
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(new ErrorResponse(errorCode.getCode(),errorCode.getMessage()));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e,HttpServletRequest req) {
+        log.error(
+                "[entity_not_found_exception, component={}, uri={}, error={}]",
+                "GlobalExceptionHandler",req.getRequestURI(),e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse("E001", e.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e,HttpServletRequest req) {
+        log.error(
+                "[Illegal_state_exception, component={}, uri={}, error={}]",
+                "GlobalExceptionHandler",req.getRequestURI(),e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("E002", e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest req) {
         BindingResult bindingResult = e.getBindingResult();
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
 
         String errorMessages = fieldErrors.stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining("\n"));
+        log.error(
+                "[method_argument_exception, component={}, uri={}, error={}]",
+                "GlobalExceptionHandler",req.getRequestURI(),e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("E003",errorMessages));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e){
-        log.error("Unexpected error occurred : {}", e.getMessage());
+    public ResponseEntity<ErrorResponse> handleException(Exception e, HttpServletRequest req){
+        log.error(
+                "[unexpected_exception, component={}, uri={}, error={}]",
+                "GlobalExceptionHandler",req.getRequestURI(),e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("E999",e.getMessage()));
     }

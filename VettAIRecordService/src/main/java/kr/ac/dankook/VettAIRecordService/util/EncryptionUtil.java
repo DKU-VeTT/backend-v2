@@ -36,7 +36,9 @@ public class EncryptionUtil {
             byte[] encryptedData = cipher.doFinal(valueBytes);
             return Base64.getUrlEncoder().withoutPadding().encodeToString(encryptedData);
         }catch (Exception e){
-            log.error("Exception during value to encrypt string - {} ",e.getMessage());
+            log.error(
+                    "[encrypt_entity_error, component={}, value={}, error={}]",
+                    "EncryptionUtil", value, e.getMessage());
             return String.valueOf(value);
         }
     }
@@ -50,7 +52,9 @@ public class EncryptionUtil {
             byte[] decryptedBytes = cipher.doFinal(decodedData);
             return ByteBuffer.wrap(decryptedBytes).getLong();
         }catch (Exception e){
-            log.error("Exception during value to decrypt pk - {} ", e.getMessage());
+            log.error(
+                    "[decrypt_entity_error, component={}, value={}, error={}]",
+                    "EncryptionUtil", encryptedData, e.getMessage());
             throw new CustomException(ErrorCode.INVALID_ENCRYPT_PK);
         }
     }

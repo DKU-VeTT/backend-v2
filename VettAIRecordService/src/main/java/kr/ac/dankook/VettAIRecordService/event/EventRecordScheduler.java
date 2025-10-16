@@ -30,7 +30,9 @@ public class EventRecordScheduler {
     @Scheduled(fixedDelay = 60000 * 10)
     @Transactional
     public void recordDeleteScheduler(){
-        log.info("[AI RecordService] Remove processed events. Date - {}", LocalDateTime.now());
+        log.info(
+                "[record_delete_scheduler, component={}, date={}]",
+                "EventRecordScheduler", LocalDateTime.now());
         entityManager.flush();
         List<EventRecord> oldRecords = eventRecordRepository.findOldRecordsByTimestamp(CLEANUP_SECONDS);
         eventRecordRepository.deleteAllInBatch(oldRecords);

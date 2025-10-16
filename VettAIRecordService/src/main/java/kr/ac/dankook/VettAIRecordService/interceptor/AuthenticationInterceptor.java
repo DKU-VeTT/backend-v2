@@ -38,7 +38,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         try{
             passport = objectMapper.readValue(decodedString, Passport.class);
         }catch (JsonProcessingException e){
-            log.error("Error during parsing passport token - {}, {}",passportString,e.getMessage()) ;
+            log.error(
+                    "[passport_json_parsing_error, component={}, token={}, error={}]",
+                    "AuthenticationInterceptor", passportString, e.getMessage());
             throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
         }
         request.setAttribute("passport", passport);

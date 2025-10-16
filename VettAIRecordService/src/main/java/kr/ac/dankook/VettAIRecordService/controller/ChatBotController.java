@@ -8,7 +8,6 @@ import kr.ac.dankook.VettAIRecordService.entity.Passport;
 import kr.ac.dankook.VettAIRecordService.service.ChatBotHistoryService;
 import kr.ac.dankook.VettAIRecordService.service.ChatBotRoomService;
 import kr.ac.dankook.VettAIRecordService.service.IdempotencyService;
-import kr.ac.dankook.VettAIRecordService.util.HashUtil;
 import kr.ac.dankook.VettAIRecordService.util.PassportMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +53,8 @@ public class ChatBotController {
             @RequestHeader("Idempotency-Key") String key,
             @PassportMember Passport passport
     ){
-        String hash = HashUtil.sha256HexOfParts(key,title);
         ChatBotRoomResponse res = idempotencyService.execute(
-                key,hash,
+                key,
                 () -> chatBotRoomService.saveNewChatBotRoom(passport.getKey(), title),
                 ChatBotRoomResponse.class
         );
