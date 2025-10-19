@@ -6,6 +6,7 @@ import kr.ac.dankook.Passport;
 import kr.ac.dankook.VettCloudGatewayService.dto.PassportResponse;
 import kr.ac.dankook.VettCloudGatewayService.error.CustomException;
 import kr.ac.dankook.VettCloudGatewayService.error.ErrorCode;
+import kr.ac.dankook.VettCloudGatewayService.log.LogMessage;
 import kr.ac.dankook.VettCloudGatewayService.service.PassportGrpcService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,21 +35,27 @@ public class PassportFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         String path = exchange.getRequest().getURI().getPath();
-        if (path.startsWith("/api/v1/auth") || path.startsWith("/actuator") || path.startsWith("/ws") ||
-                path.startsWith("/pub") || path.startsWith("/sub")){
+        if (path.startsWith("/api/v1/auth") || path.startsWith("/actuator") || path.startsWith("/eureka")
+                || path.startsWith("/ws") || path.startsWith("/pub") || path.startsWith("/sub")){
             return chain.filter(exchange);
         }
         String key = exchange.getAttribute("key");
         Passport.PassportResponse passport = passportGrpcService.getPassportInfo(key);
-        if (passport == null) throw new CustomException(ErrorCode.PASSPORT_ERROR);
+
+        if (passport == null) throw new CustomException(ErrorCode.PASSPORT_ERROR,className,methodName);
 
         PassportResponse passportEntity = new PassportResponse(passport);
         String payload;
+
         try{
             payload = objectMapper.writeValueAsString(passportEntity);
         }catch (JsonProcessingException e){
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR,className,methodName,e.getMessage());
         }
         String encodedPayload = Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
         ServerHttpRequest mutatedRequest = exchange.getRequest()
@@ -61,8 +68,8 @@ public class PassportFilter implements GlobalFilter {
                 })
                 .build();
         log.info(
-                "[success_gateway_passport, component={}, userKey={}]",
-                "GatewayPassportFilter", key);
+                "[{}, class={}, method={}, userKey={}]",
+                LogMessage.SUCCESS_GATEWAY_PASSPORT,className,methodName, key);
         ServerWebExchange mutatedExchange = exchange.mutate()
                 .request(mutatedRequest)
                 .build();

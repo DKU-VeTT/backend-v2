@@ -22,7 +22,7 @@
         <destination>${LOGSTASH_HOST}:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <includeMdc>true</includeMdc>
-            <customFields>{ "server":"Gateway","env":"local" }</customFields>
+            <customFields>{ "server":"Gateway" }</customFields>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
