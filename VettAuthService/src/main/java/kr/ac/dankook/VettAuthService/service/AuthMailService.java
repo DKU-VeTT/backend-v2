@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import kr.ac.dankook.VettAuthService.dto.request.MailRequest;
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import kr.ac.dankook.VettAuthService.error.exception.CustomException;
+import kr.ac.dankook.VettAuthService.log.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,11 @@ public class AuthMailService {
 
     @Async
     public void sendMail(MailRequest mailRequest){
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try{
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true,"UTF-8");
@@ -34,12 +40,13 @@ public class AuthMailService {
             helper.setText(mailRequest.getContent(),true);
             helper.setFrom(adminMailAddress);
             helper.setReplyTo(adminMailAddress);
-            log.info("Sending mail to {}", mailRequest.getEmail());
 
             mailSender.send(mimeMessage);
+            log.info("[{}, class={}, method={}, mailTo={}]",
+                    LogMessage.SUCCESS_SEND_MAIL, className, methodName,  mailRequest.getEmail());
+
         }catch (MessagingException e){
-            log.error("Failed to send mail - {}", e.getMessage());
-            throw new CustomException(ErrorCode.CERTIFICATE_SEND_MAIL_ERROR);
+            throw new CustomException(ErrorCode.CERTIFICATE_SEND_MAIL_ERROR,className,methodName,e.getMessage());
         }
     }
 

@@ -12,8 +12,12 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      observation-enabled: true
     consumer:
       enable-auto-commit: false
+    template:
+      observation-enabled: true
 
   mail:
     host: ${MAIL_HOST}
@@ -54,12 +58,23 @@ spring:
       port: ${GRPC_SERVER_PORT}
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics,info"
+  metrics:
+    enable:
+      all: true
+
   tracing:
     sampling:
       probability: 1.0
+    propagation:
+      consume: b3
+      produce: b3_multi
   zipkin:
     tracing:
-      endpoint: ${ZINKIN_SERVICE_URL}
+      endpoint: ${ZIPKIN_SERVICE_URL}
 
 eureka:
   client:
@@ -70,6 +85,8 @@ eureka:
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME}
 
+logstash:
+  host: ${LOGSTASH_HOST}
 
 server:
   port: 8081

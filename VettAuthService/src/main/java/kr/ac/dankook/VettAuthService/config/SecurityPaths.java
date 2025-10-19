@@ -10,8 +10,8 @@ public final class SecurityPaths {
 
     public static final List<String> OPEN_PREFIXES = List.of(
             "/api/v1/auth",
-            "/actuator/health",
-            "/eureka/**"
+            "/actuator/",
+            "/eureka/"
     );
 
     public static boolean isOpen(HttpServletRequest request) {

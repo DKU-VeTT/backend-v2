@@ -21,8 +21,13 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         Optional<Member> memberEntity = memberRepository.findByUserId(username);
         return memberEntity.map(PrincipalDetails::new)
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_CREDENTIAL));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_CREDENTIAL,className,methodName,"USER ID : " + username));
     }
 }

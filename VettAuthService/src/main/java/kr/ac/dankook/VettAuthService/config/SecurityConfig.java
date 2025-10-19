@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorizeRequests) ->
                         authorizeRequests
-                                .requestMatchers("/actuator/health", "/eureka/**","/api/v1/auth/**").permitAll()
+                                .requestMatchers("/actuator/**", "/eureka/**","/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/v1/user/**").hasAnyRole("USER","ADMIN")
                                 .anyRequest().authenticated()
                 )

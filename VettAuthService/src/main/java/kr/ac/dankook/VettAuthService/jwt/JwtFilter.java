@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.ac.dankook.VettAuthService.config.SecurityPaths;
+import kr.ac.dankook.VettAuthService.config.principal.PrincipalDetails;
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try{
             Authentication authentication = jwtTokenProvider.validateToken(authToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            request.setAttribute("userKey", jwtTokenProvider.getUserKeyFromToken(authToken));
         }catch (JWTVerificationException e) {
             SecurityContextHolder.clearContext();
             request.setAttribute("exception", e);

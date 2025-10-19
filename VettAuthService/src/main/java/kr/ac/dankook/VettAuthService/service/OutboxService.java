@@ -31,6 +31,10 @@ public class OutboxService {
 
     private String makeOutboxPayload(String eventId, Map<String,String> payloadMap, OutboxEventType outboxEventType){
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         Map<String, Object> payload = new HashMap<>();
         String eventDomain = outboxEventType.getEventDomain();
         String eventType = outboxEventType.getEventType();
@@ -42,7 +46,7 @@ public class OutboxService {
         try{
             return objectMapper.writeValueAsString(payload);
         }catch (JsonProcessingException e){
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR,className,methodName,e.getMessage());
         }
     }
 
@@ -63,8 +67,13 @@ public class OutboxService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void convertOutboxStatus(String id,OutboxStatus outboxStatus){
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         Outbox outbox = outboxRepository.findById(id)
-                .orElseThrow(() ->  new EntityNotFoundException("저장된 데이터가 존재하지 않습니다."));
+                .orElseThrow(() ->  new EntityNotFoundException("저장된 데이터가 존재하지 않습니다.",className,methodName));
         outbox.setStatus(outboxStatus);
         outboxRepository.save(outbox);
     }

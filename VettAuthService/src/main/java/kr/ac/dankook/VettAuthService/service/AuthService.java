@@ -66,8 +66,13 @@ public class AuthService {
 
     @Transactional
     public void signup(SignupRequest signupRequest) {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         if (memberRepository.existsByUserId(signupRequest.getUserId())){
-            throw new CustomException(ErrorCode.DUPLICATE_ID);
+            throw new CustomException(ErrorCode.DUPLICATE_ID,className,methodName,"ID : " + signupRequest.getUserId());
         }
         Member newMember = Member.builder()
                 .email(signupRequest.getEmail())
@@ -80,6 +85,10 @@ public class AuthService {
 
     public TokenResponse login(LoginRequest loginRequest){
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try{
             UsernamePasswordAuthenticationToken authenticationToken
                     = new UsernamePasswordAuthenticationToken(loginRequest.getUserId(),loginRequest.getPassword());
@@ -87,24 +96,28 @@ public class AuthService {
                     .authenticate(authenticationToken);
             return createTokenAndSaveInCache(authentication,loginRequest.getUserId());
         }catch (InternalAuthenticationServiceException | BadCredentialsException e){
-            throw new CustomException(ErrorCode.BAD_CREDENTIAL);
+            throw new CustomException(ErrorCode.BAD_CREDENTIAL,className,methodName,e.getMessage());
         }
     }
 
     public TokenResponse reissueToken(String refreshToken){
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         Authentication authentication;
         try{
             authentication = jwtTokenProvider.validateToken(refreshToken.trim());
         }catch (JWTVerificationException e){
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
+            throw new CustomException(ErrorCode.INVALID_TOKEN,className,methodName,e.getMessage());
         }
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         String userId = principalDetails.getUsername();
 
         Optional<String> existRefreshToken = authCacheService.getRefreshToken(userId);
         if (existRefreshToken.isEmpty() || !existRefreshToken.get().equals(refreshToken)){
-            throw new CustomException(ErrorCode.BAD_CREDENTIAL);
+            throw new CustomException(ErrorCode.BAD_CREDENTIAL,className,methodName, "TOKEN : " + refreshToken);
         }
         return createTokenAndSaveInCache(authentication,userId);
     }

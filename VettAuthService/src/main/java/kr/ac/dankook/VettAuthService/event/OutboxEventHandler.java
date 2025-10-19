@@ -19,10 +19,12 @@ public class OutboxEventHandler {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePublishEvent(OutboxEvent event){
-        String id = event.getId();
-        String eventType = event.getEventType();
-        String payload = event.getPayload();
-        String partitionKey = event.getPartitionKey();
-        outboxEventPublisher.publishOutboxEvent(id,eventType,partitionKey,payload);
+        try (var scope = event.getSnapshot().setThreadLocals()) {
+            String id = event.getId();
+            String eventType = event.getEventType();
+            String payload = event.getPayload();
+            String partitionKey = event.getPartitionKey();
+            outboxEventPublisher.publishOutboxEvent(id,eventType,partitionKey,payload);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package kr.ac.dankook.VettAuthService.service;
 
+import io.micrometer.context.ContextSnapshotFactory;
 import kr.ac.dankook.VettAuthService.entity.Member;
 import kr.ac.dankook.VettAuthService.entity.outbox.Outbox;
 import kr.ac.dankook.VettAuthService.entity.outbox.OutboxEvent;
@@ -15,7 +16,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,10 +29,16 @@ public class MemberService {
     private final ApplicationEventPublisher eventPublisher;
     private final OutboxService outboxService;
     private final OutboxRepository outboxRepository;
+    private final ContextSnapshotFactory snapshotFactory;
 
     public Member getCurrentMember(String userId){
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         return memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND,className,methodName, "USER ID : " + userId));
     }
 
     @Transactional
@@ -71,6 +77,6 @@ public class MemberService {
         // member.convertToDeletedMember();
         memberRepository.save(member);
         // Outbox 이벤트 발행
-        eventPublisher.publishEvent(new OutboxEvent(outbox));
+        eventPublisher.publishEvent(new OutboxEvent(outbox, snapshotFactory.captureAll()));
     }
 }

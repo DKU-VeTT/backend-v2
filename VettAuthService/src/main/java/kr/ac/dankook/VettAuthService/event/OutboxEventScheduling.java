@@ -3,6 +3,7 @@ package kr.ac.dankook.VettAuthService.event;
 import jakarta.persistence.EntityManager;
 import kr.ac.dankook.VettAuthService.entity.outbox.Outbox;
 import kr.ac.dankook.VettAuthService.entity.outbox.OutboxStatus;
+import kr.ac.dankook.VettAuthService.log.LogMessage;
 import kr.ac.dankook.VettAuthService.repository.OutboxRepository;
 import kr.ac.dankook.VettAuthService.service.OutboxCacheService;
 import kr.ac.dankook.VettAuthService.service.OutboxService;
@@ -31,8 +32,14 @@ public class OutboxEventScheduling {
     private final RetryTemplate retryTemplate;
 
     @Scheduled(fixedDelay = 60000 * 5) // 5 minute
-    public void retryPublishMessage() {
-        log.info("[Auth Service] Start retry publish message. Date : {}", LocalDateTime.now());
+    public void retryPublishEvent() {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+        log.info("[{}, class={}, method={}, date={}]",
+                LogMessage.RETRY_PUBLISH_EVENT, className, methodName, LocalDateTime.now());
+
 
         List<Outbox> outboxes = outboxRepository.findByStatusIn(List.of(OutboxStatus.READY_TO_PUBLISH,OutboxStatus.FAILED));
         for (Outbox outbox : outboxes) {
@@ -45,7 +52,8 @@ public class OutboxEventScheduling {
                 outboxEventPublisher.publishOutboxEvent(id,eventType,partitionKey,payload);
                 return null;
             }, ctx -> {
-                log.error("[Auth Service] Retry exhausted ({} attempts). id={}",ctx.getRetryCount(), id);
+                log.error("[{}, class={}, method={}, id={}, attempts={}]",
+                        LogMessage.RETRY_PUBLISH_EVENT_EXHAUSTED, className, methodName, id,ctx.getRetryCount());
                 outboxCacheService.deleteOutboxId(id);
                 outboxService.convertOutboxStatus(id, OutboxStatus.PERMANENT_FAILURE);
                 return null;
@@ -56,7 +64,12 @@ public class OutboxEventScheduling {
     @Scheduled(fixedDelay = 60000 * 10) // 10 minute
     @Transactional
     public void removePublishedEvents(){
-        log.info("[Auth Service] Remove all published events. Date - {}",LocalDateTime.now());
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+        log.info("[{}, class={}, method={}, date={}]",
+                LogMessage.REMOVE_PUBLISHED_EVENT, className, methodName, LocalDateTime.now());
+
         List<Outbox> outboxes = outboxRepository.findByStatusIn(List.of(OutboxStatus.PUBLISHED));
         Set<String> outboxIds = outboxes.stream().map(Outbox::getId).collect(Collectors.toSet());
         entityManager.flush();

@@ -45,5 +45,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         }
         jwtErrorResponseHandler.sendErrorResponse(response, ErrorCode.INTERNAL_SERVER_ERROR);
     }
-
 }

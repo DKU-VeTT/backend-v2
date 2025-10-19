@@ -7,6 +7,8 @@ import kr.ac.dankook.VettAuthService.dto.request.MemberPasswordChangeRequest;
 import kr.ac.dankook.VettAuthService.dto.response.ApiMessageResponse;
 import kr.ac.dankook.VettAuthService.dto.response.ApiResponse;
 import kr.ac.dankook.VettAuthService.dto.response.MemberResponse;
+import kr.ac.dankook.VettAuthService.error.ErrorCode;
+import kr.ac.dankook.VettAuthService.error.exception.CustomException;
 import kr.ac.dankook.VettAuthService.service.AuthService;
 import kr.ac.dankook.VettAuthService.service.MemberService;
 import lombok.RequiredArgsConstructor;
