@@ -2,6 +2,7 @@ package kr.ac.dankook.VettChatService.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.ac.dankook.VettChatService.dto.request.ChatMessageRequest;
+import kr.ac.dankook.VettChatService.log.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class SendChatEventSubscriber {
 
-    private static final String CHAT_TOPIC = "chat.room.event.message";
+    public static final String CHAT_TOPIC = "chat.room.event.message";
     private final static String DESTINATION_PREFIX = "/sub/chat/room/";
 
     private final SimpMessageSendingOperations messagingTemplate;
@@ -23,12 +24,19 @@ public class SendChatEventSubscriber {
     // Have Three partitions
     @KafkaListener(groupId = "VETT_CHAT", topics = CHAT_TOPIC, concurrency = "3")
     public void handleReceiveChatMessage(String message, Acknowledgment acknowledgment) {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try{
             ChatMessageRequest messageDto = objectMapper.readValue(message, ChatMessageRequest.class);
             messagingTemplate.convertAndSend(DESTINATION_PREFIX +  messageDto.getRoomId(), messageDto);
+            acknowledgment.acknowledge();
         }catch(Exception e){
-            log.error("Json processing error during parsing message - {}",e.getMessage());
+            log.error(
+                    "[{}, class={}, method={}, message={}, error={}]",
+                    LogMessage.KAFKA_LISTENER_EXCEPTION,className,methodName, message, e.getMessage());
         }
-        acknowledgment.acknowledge();
     }
 }

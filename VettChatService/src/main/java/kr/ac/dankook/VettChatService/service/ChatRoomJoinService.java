@@ -31,8 +31,12 @@ public class ChatRoomJoinService {
 
     public boolean isJoinChatRoom(Long roomId, String memberId){
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다.",className,methodName));
         Optional<ChatRoomParticipant> participant = chatRoomParticipantRepository
                 .findByChatRoomAndMemberId(chatRoom ,memberId);
         return participant.isPresent();
@@ -41,10 +45,14 @@ public class ChatRoomJoinService {
     @Transactional
     public ChatRoomResponse joinChatRoom(Long roomId, String nickname, String memberId){
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         ChatRoom chatRoom = chatRoomRepository.findByIdWithOptimisticLock(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다.",className,methodName));
         if(isJoinChatRoom(roomId,memberId)){
-            throw new CustomException(ErrorCode.ALREADY_JOIN_CHATROOM);
+            throw new CustomException(ErrorCode.ALREADY_JOIN_CHATROOM,className,methodName);
         }
         chatRoom.increaseParticipants();
         if(chatRoom.getOwnerId().equals(memberId)){
@@ -62,13 +70,17 @@ public class ChatRoomJoinService {
     @Transactional
     public void leaveChatRoom(Long roomId, String memberId){
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         String encryptRoomId = EncryptionUtil.encrypt(roomId);
         ChatRoom chatRoom = chatRoomRepository.findByIdWithOptimisticLock(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다.",className,methodName));
         ChatRoomParticipant participant = chatRoomParticipantRepository
-                .findByChatRoomAndMemberId(chatRoom, memberId).orElseThrow(() -> new EntityNotFoundException("참여하고 있는 사용자를 찾을 수 없습니다."));
+                .findByChatRoomAndMemberId(chatRoom, memberId).orElseThrow(() -> new EntityNotFoundException("참여하고 있는 사용자를 찾을 수 없습니다.",className,methodName));
         int currentCnt = chatRoom.decreaseParticipants();
-        
+
         if (currentCnt <= 0){
             chatRoomParticipantRepository.delete(participant);
             chatRoomRepository.delete(chatRoom);
@@ -76,9 +88,11 @@ public class ChatRoomJoinService {
             chatMessageRepository.deleteAll(messages);
             return;
         }
+
         if(chatRoom.getOwnerId().equals(memberId)){
             chatRoom.updateChatRoomStatus(ChatRoomStatus.READ_ONLY);
         }
+
         chatRoomRepository.save(chatRoom);
         chatRoomParticipantRepository.delete(participant);
         chatEventPublisher.sendChatMessage(makeMetaMessagePayload(chatRoom, memberId, participant.getNickname(),MessageType.QUIT));

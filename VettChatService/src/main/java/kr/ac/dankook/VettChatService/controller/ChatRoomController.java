@@ -6,10 +6,13 @@ import kr.ac.dankook.VettChatService.dto.response.ApiMessageResponse;
 import kr.ac.dankook.VettChatService.dto.response.ApiResponse;
 import kr.ac.dankook.VettChatService.dto.response.ChatRoomResponse;
 import kr.ac.dankook.VettChatService.entity.Passport;
+import kr.ac.dankook.VettChatService.error.ErrorCode;
+import kr.ac.dankook.VettChatService.error.exception.CustomException;
 import kr.ac.dankook.VettChatService.facade.ChatRoomJoinFacade;
 import kr.ac.dankook.VettChatService.service.ChatRoomJoinService;
 import kr.ac.dankook.VettChatService.service.ChatRoomPinService;
 import kr.ac.dankook.VettChatService.service.ChatRoomService;
+import kr.ac.dankook.VettChatService.service.IdempotencyService;
 import kr.ac.dankook.VettChatService.util.DecryptId;
 import kr.ac.dankook.VettChatService.util.PassportMember;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class ChatRoomController {
     private final ChatRoomJoinFacade chatRoomJoinFacade;
     private final ChatRoomJoinService chatRoomJoinService;
     private final ChatRoomPinService chatRoomPinService;
+    private final IdempotencyService idempotencyService;
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<List<ChatRoomResponse>>> getMyChatRooms(
@@ -50,11 +54,17 @@ public class ChatRoomController {
     @PostMapping
     public ResponseEntity<ApiResponse<ChatRoomResponse>> createNewChatRoom(
             @RequestBody @Valid ChatRoomCreateRequest request,
+            @RequestHeader("Idempotency-Key") String key,
             @PassportMember Passport passport
     )
     {
+        ChatRoomResponse res = idempotencyService.execute(
+                key,
+                () -> chatRoomService.saveNewChatRoom(passport.getKey(), request),
+                ChatRoomResponse.class
+        );
         return ResponseEntity.status(201).body(new ApiResponse<>(true,201,
-                chatRoomService.saveNewChatRoom(passport.getKey(),request)));
+                res));
     }
 
     @GetMapping
@@ -74,10 +84,18 @@ public class ChatRoomController {
     @PostMapping("/pin/{roomId}")
     public ResponseEntity<ApiResponse<Boolean>> togglePin(
             @PathVariable @DecryptId Long roomId,
+            @RequestHeader("Idempotency-Key") String key,
             @PassportMember Passport passport
     ){
+
+        Boolean res = idempotencyService.execute(
+                key,
+                () -> chatRoomPinService.toggleChatRoomPin(roomId,passport.getKey()),
+                Boolean.class
+        );
+
         return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
-               chatRoomPinService.toggleChatRoomPin(roomId,passport.getKey())));
+                res));
     }
 
     @GetMapping("/join/{roomId}")
@@ -92,11 +110,28 @@ public class ChatRoomController {
     @PostMapping("/join/{roomId}")
     public ResponseEntity<ApiResponse<ChatRoomResponse>> joinChatRoom(
             @PathVariable @DecryptId Long roomId,
+            @RequestHeader("Idempotency-Key") String key,
             @RequestParam("nickname") String nickname,
             @PassportMember Passport passport
-    ) throws InterruptedException {
+    ) {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
+        ChatRoomResponse res = idempotencyService.execute(
+                key,
+                () -> {
+                    try {
+                        return chatRoomJoinFacade.joinChatRoom(roomId,nickname,passport.getKey());
+                    } catch (InterruptedException e){
+                        throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, className, methodName);
+                    }
+                },
+                ChatRoomResponse.class
+        );
         return ResponseEntity.status(200).body(new ApiResponse<>(true,201,
-                chatRoomJoinFacade.joinChatRoom(roomId,nickname,passport.getKey())));
+                res));
     }
 
     @DeleteMapping("/join/{roomId}")

@@ -13,6 +13,10 @@ public enum ErrorCode {
     // 권한관련 에러
     ACCESS_DENIED(HttpStatus.FORBIDDEN,"P001","접근 권한이 존재하지 않습니다."),
 
+    // Idempotency 전용 에러
+    IDEMPOTENCY_KEY_REQUIRED(HttpStatus.BAD_REQUEST, "I001", "Idempotency-Key 헤더가 누락되었습니다."),
+    IDEMPOTENCY_IN_PROGRESS_CONFLICT(HttpStatus.CONFLICT, "I002", "요청이 처리 중입니다."),
+
     // 채팅관련 에러
     EXCEED_PARTICIPANT(HttpStatus.INTERNAL_SERVER_ERROR,"C001","최대 참가 인원을 초과하였습니다."),
     RANGE_ERROR_PARTICIPANT(HttpStatus.NOT_FOUND,"C002","채팅방에 참여한 참가자가 존재하지 않습니다"),

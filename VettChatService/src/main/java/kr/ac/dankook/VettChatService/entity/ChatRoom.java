@@ -62,15 +62,25 @@ public class ChatRoom extends BaseEntity {
     }
 
     public void increaseParticipants() {
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
+
         if (this.currentParticipants >= this.maxParticipants){
-            throw new CustomException(ErrorCode.EXCEED_PARTICIPANT);
+            throw new CustomException(ErrorCode.EXCEED_PARTICIPANT,className,methodName);
         }
         this.currentParticipants++;
     }
 
     public int decreaseParticipants() {
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
+
         if (this.currentParticipants <= 0){
-            throw new CustomException(ErrorCode.RANGE_ERROR_PARTICIPANT);
+            throw new CustomException(ErrorCode.RANGE_ERROR_PARTICIPANT, className,methodName);
         }
         return --this.currentParticipants;
     }

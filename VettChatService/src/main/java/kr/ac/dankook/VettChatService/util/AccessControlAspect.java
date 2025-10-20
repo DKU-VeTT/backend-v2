@@ -24,11 +24,15 @@ public class AccessControlAspect {
     @Around("@annotation(accessControl)")
     public Object checkRole(ProceedingJoinPoint joinPoint, AccessControl accessControl) throws Throwable {
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) attrs).getRequest();
         String role = (String) request.getAttribute("role");
         if (!role.equals(accessControl.value())) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
+            throw new CustomException(ErrorCode.ACCESS_DENIED,className,methodName);
         }
         return joinPoint.proceed();
     }
