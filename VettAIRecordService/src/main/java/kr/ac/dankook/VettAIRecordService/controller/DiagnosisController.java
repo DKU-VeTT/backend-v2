@@ -44,8 +44,12 @@ public class DiagnosisController {
             @RequestHeader("Idempotency-Key") String key,
             @PassportMember Passport passport
     ){
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         if (file == null){
-            throw new CustomException(ErrorCode.INVALID_REQUEST_PARAM);
+            throw new CustomException(ErrorCode.INVALID_REQUEST_PARAM,className,methodName);
         }
         String res = idempotencyService.execute(
                 key,

@@ -21,6 +21,11 @@ public class StorageService {
     private final GridFsTemplate gridFsTemplate;
 
     public String uploadFile(MultipartFile file) {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try (var in = file.getInputStream()) {
             var contentType = Optional.of(file.getContentType()).orElse("application/octet-stream");
             var meta = new org.bson.Document("contentType", contentType);
@@ -28,10 +33,10 @@ public class StorageService {
                     .store(in, file.getOriginalFilename(), contentType, meta)
                     .toHexString();
         } catch (Exception e) {
-            log.error(
-                    "[upload_file_error, component={}, fileName={}, type={}, error={}]",
-                    "StorageService",file.getOriginalFilename(), file.getContentType(), e.getMessage());
-            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
+            String metaData = "FILENAME : " + file.getOriginalFilename() +
+                    "TYPE : " + file.getContentType() +
+                    "ERROR : " + e.getMessage();
+            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR,className,methodName, metaData);
         }
     }
 
@@ -41,12 +46,15 @@ public class StorageService {
     }
 
     public void deleteFile(ObjectId id){
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try{
             gridFsTemplate.delete(getQueryById(id));
         }catch (Exception e){
-            log.error(
-                    "[delete_file_error, component={}, id={}, error={}]",
-                    "StorageService",id.toHexString(), e.getMessage());
+            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR,className,methodName, e.getMessage());
         }
     }
 

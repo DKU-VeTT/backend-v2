@@ -28,6 +28,11 @@ public class EncryptionUtil {
     }
 
     public static String encrypt(Long value) {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try{
             SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY, ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -36,14 +41,16 @@ public class EncryptionUtil {
             byte[] encryptedData = cipher.doFinal(valueBytes);
             return Base64.getUrlEncoder().withoutPadding().encodeToString(encryptedData);
         }catch (Exception e){
-            log.error(
-                    "[encrypt_entity_error, component={}, value={}, error={}]",
-                    "EncryptionUtil", value, e.getMessage());
-            return String.valueOf(value);
+            throw new CustomException(ErrorCode.INVALID_ENCRYPT_PK,className,methodName,e.getMessage());
         }
     }
 
     public static Long decrypt(String encryptedData) {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try{
             SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY, ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -52,10 +59,7 @@ public class EncryptionUtil {
             byte[] decryptedBytes = cipher.doFinal(decodedData);
             return ByteBuffer.wrap(decryptedBytes).getLong();
         }catch (Exception e){
-            log.error(
-                    "[decrypt_entity_error, component={}, value={}, error={}]",
-                    "EncryptionUtil", encryptedData, e.getMessage());
-            throw new CustomException(ErrorCode.INVALID_ENCRYPT_PK);
+            throw new CustomException(ErrorCode.INVALID_ENCRYPT_PK,className,methodName,e.getMessage());
         }
     }
 }

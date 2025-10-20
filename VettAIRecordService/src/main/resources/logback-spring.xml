@@ -12,7 +12,7 @@
         <destination>${LOGSTASH_HOST}:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <includeMdc>true</includeMdc>
-            <customFields>{ "service":"AI Record","env":"local" }</customFields>
+            <customFields>{ "service":"AI Record" }</customFields>
         </encoder>
         <keepAliveDuration>5 minutes</keepAliveDuration>
         <reconnectionDelay>3 seconds</reconnectionDelay>
@@ -22,7 +22,7 @@
         <destination>${LOGSTASH_HOST}:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <includeMdc>true</includeMdc>
-            <customFields>{ "service":"AI Record","env":"local" }</customFields>
+            <customFields>{ "service":"AI Record" }</customFields>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>

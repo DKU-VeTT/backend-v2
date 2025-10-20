@@ -27,9 +27,13 @@ public class IdempotencyService{
     @SuppressWarnings({"ConstantConditions"})
     public <T> T execute(String key, Supplier<T> action,Class<T> tClass){
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         // Idem Key가 없는 경우
         if (key == null || key.isBlank()){
-            throw new CustomException(ErrorCode.IDEMPOTENCY_KEY_REQUIRED);
+            throw new CustomException(ErrorCode.IDEMPOTENCY_KEY_REQUIRED,className,methodName);
         }
         String stateKey = "idem:" + key  + ":state";
         String respKey = "idem:" + key + ":resp";
@@ -43,11 +47,11 @@ public class IdempotencyService{
                 try{
                     return objectMapper.readValue(cached, tClass);
                 }catch (JsonProcessingException e){
-                    throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+                    throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR,className,methodName,e.getMessage());
                 }
             }
             // lock을 얻지 못하고 ( 충돌 상황 ) & cache 값도 없는 상황 or 다른 요청을 통해 처리중인 상황
-            throw new CustomException(ErrorCode.IDEMPOTENCY_IN_PROGRESS_CONFLICT);
+            throw new CustomException(ErrorCode.IDEMPOTENCY_IN_PROGRESS_CONFLICT,className,methodName);
         }
 
         try{
@@ -59,7 +63,7 @@ public class IdempotencyService{
             return result;
         }catch (JsonProcessingException e){
             redisTemplate.delete(stateKey);
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR,className,methodName,e.getMessage());
         }catch (Throwable t){
             redisTemplate.delete(stateKey);
             throw t;

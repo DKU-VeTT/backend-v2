@@ -28,21 +28,23 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         String passportKey = request.getHeader("X-Passport-Secret");
-        if (passportKey == null || !passportKey.equals(PASSPORT_SECRET_KEY)) throw new CustomException(ErrorCode.UNAUTHORIZED);
+        if (passportKey == null || !passportKey.equals(PASSPORT_SECRET_KEY)) throw new CustomException(ErrorCode.UNAUTHORIZED,className,methodName);
 
         String passportString = request.getHeader("X-Passport");
         String decodedString = new String(Base64.getDecoder().decode(passportString), StandardCharsets.UTF_8);
-        Passport passport;
 
+        Passport passport;
         try{
             passport = objectMapper.readValue(decodedString, Passport.class);
         }catch (JsonProcessingException e){
-            log.error(
-                    "[passport_json_parsing_error, component={}, token={}, error={}]",
-                    "AuthenticationInterceptor", passportString, e.getMessage());
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR,className,methodName,e.getMessage());
         }
+        request.setAttribute("userKey",passport.getKey());
         request.setAttribute("passport", passport);
         request.setAttribute("role",passport.getRole());
         return true;

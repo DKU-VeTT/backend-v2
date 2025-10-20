@@ -15,7 +15,7 @@ public enum ErrorCode {
 
     // Idempotency 전용 에러
     IDEMPOTENCY_KEY_REQUIRED(HttpStatus.BAD_REQUEST, "I001", "Idempotency-Key 헤더가 누락되었습니다."),
-    IDEMPOTENCY_IN_PROGRESS_CONFLICT(HttpStatus.CONFLICT, "I004", "요청이 처리 중입니다."),
+    IDEMPOTENCY_IN_PROGRESS_CONFLICT(HttpStatus.CONFLICT, "I002", "요청이 처리 중입니다."),
 
     // 입력값 검증 에러
     INVALID_ENCRYPT_PK(HttpStatus.BAD_REQUEST,"V001", "유효하지 않은 데이터 아이디 형식입니다."),
