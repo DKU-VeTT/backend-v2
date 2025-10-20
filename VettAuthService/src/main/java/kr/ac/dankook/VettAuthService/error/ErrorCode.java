@@ -19,6 +19,11 @@ public enum ErrorCode {
     BAD_CREDENTIAL(HttpStatus.UNAUTHORIZED,"A004","자격증명에 실패하였습니다."),
     CERTIFICATE_SEND_MAIL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"A005","이메일 인증 과정 중 오류가 발생하였습니다."),
 
+    // Idempotency 전용 에러
+    IDEMPOTENCY_KEY_REQUIRED(HttpStatus.BAD_REQUEST, "I001", "Idempotency-Key 헤더가 누락되었습니다."),
+    IDEMPOTENCY_IN_PROGRESS_CONFLICT(HttpStatus.CONFLICT, "I002", "요청이 처리 중입니다."),
+
+
     // 권한관련 에러
     ACCESS_DENIED(HttpStatus.FORBIDDEN,"P001","접근 권한이 존재하지 않습니다."),
 

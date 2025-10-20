@@ -7,6 +7,7 @@ import kr.ac.dankook.VettAuthService.entity.outbox.OutboxEvent;
 import kr.ac.dankook.VettAuthService.entity.outbox.OutboxEventType;
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import kr.ac.dankook.VettAuthService.error.exception.CustomException;
+import kr.ac.dankook.VettAuthService.log.LogMessage;
 import kr.ac.dankook.VettAuthService.repository.MemberRepository;
 import kr.ac.dankook.VettAuthService.repository.OutboxRepository;
 import kr.ac.dankook.VettAuthService.util.EncryptionUtil;
@@ -65,8 +66,15 @@ public class MemberService {
     @Transactional
     public void deleteMember(Member member) {
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         // Outbox 저장
         String userKey = EncryptionUtil.encrypt(member.getId());
+
+        log.info("[{}, class={}, method={}, userKey={}]", LogMessage.MEMBER_DELETED,className,methodName,
+                userKey);
 
         Map<String,String> payloadMap = new HashMap<>();
         payloadMap.put("userKey",userKey);

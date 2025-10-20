@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         String className = e.getClassName();
         String methodName = e.getMethodName();
         String userKey = (String) req.getAttribute("userKey");
-        String resultKey = Objects.requireNonNullElse(userKey, "DEFAULT");
+        String resultKey = Objects.requireNonNullElse(userKey, "NOT_USER");
 
         log.error(
                 "[{}, uri={}, class={}, method={}, userKey={}, error={}, detailError={}]",
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
         String className = e.getClassName();
         String methodName = e.getMethodName();
         String userKey = (String) req.getAttribute("userKey");
-        String resultKey = Objects.requireNonNullElse(userKey, "DEFAULT");
+        String resultKey = Objects.requireNonNullElse(userKey, "NOT_USER");
 
         log.error(
                 "[{}, uri={}, class={}, method={}, userKey={}, error={}]",
@@ -98,7 +98,7 @@ public class GlobalExceptionHandler {
 
         log.error(
                 "[{}, uri={}, class={}, method={}, userKey={}, error={}]",
-                LogMessage.ILLEGAL_STATE, le.getUri(), le.getClassName(), le.getMethodName(), le.getUserKey(), e.getMessage());
+                LogMessage.UNEXPECTED_EXCEPTION, le.getUri(), le.getClassName(), le.getMethodName(), le.getUserKey(), e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("E999",e.getMessage()));
     }

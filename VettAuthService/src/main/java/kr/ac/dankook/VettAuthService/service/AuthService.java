@@ -10,12 +10,11 @@ import kr.ac.dankook.VettAuthService.entity.*;
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import kr.ac.dankook.VettAuthService.error.exception.CustomException;
 import kr.ac.dankook.VettAuthService.jwt.JwtTokenProvider;
+import kr.ac.dankook.VettAuthService.log.LogMessage;
 import kr.ac.dankook.VettAuthService.repository.MemberRepository;
-import kr.ac.dankook.VettAuthService.repository.OutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,11 +47,12 @@ public class AuthService {
         return new MailRequest(email,title,content);
     }
 
-    public void sendCertificateCode(Member member){
+    public String sendCertificateCode(Member member){
         String randomCode = RandomStringUtils.randomAlphanumeric(6);
         MailRequest mail = generateMailRequest(member.getEmail(),randomCode);
         authMailService.sendMail(mail);
         authCacheService.saveCertificateCode(member,randomCode);
+        return member.getUserId();
     }
 
     public List<String> getUserIdByNameAndEmail(String name, String email){
@@ -65,7 +65,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void signup(SignupRequest signupRequest) {
+    public String signup(SignupRequest signupRequest) {
 
         String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
         String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
@@ -81,6 +81,9 @@ public class AuthService {
                 .userId(signupRequest.getUserId())
                 .role(MemberRole.USER).build();
         memberRepository.save(newMember);
+        log.info("[{}, class={}, method={}, name={}, userId={}]", LogMessage.MEMBER_SIGNUP,className,methodName,
+                signupRequest.getName(),signupRequest.getUserId());
+        return "회원가입을 완료하였습니다.";
     }
 
     public TokenResponse login(LoginRequest loginRequest){
@@ -94,6 +97,7 @@ public class AuthService {
                     = new UsernamePasswordAuthenticationToken(loginRequest.getUserId(),loginRequest.getPassword());
             Authentication authentication = authenticationManager.getObject()
                     .authenticate(authenticationToken);
+            log.info("[{}, class={}, method={}, userId={}]", LogMessage.MEMBER_LOGIN,className,methodName,loginRequest.getUserId());
             return createTokenAndSaveInCache(authentication,loginRequest.getUserId());
         }catch (InternalAuthenticationServiceException | BadCredentialsException e){
             throw new CustomException(ErrorCode.BAD_CREDENTIAL,className,methodName,e.getMessage());
@@ -123,9 +127,10 @@ public class AuthService {
     }
 
 
-    public void logout(String userId){
+    public String logout(String userId){
         authCacheService.deleteKey(userId);
         SecurityContextHolder.clearContext();
+        return "로그아웃에 성공하였습니다.";
     }
 
 

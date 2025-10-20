@@ -10,6 +10,7 @@ import kr.ac.dankook.VettAuthService.dto.response.TokenResponse;
 import kr.ac.dankook.VettAuthService.entity.Member;
 import kr.ac.dankook.VettAuthService.service.AuthCacheService;
 import kr.ac.dankook.VettAuthService.service.AuthService;
+import kr.ac.dankook.VettAuthService.service.IdempotencyService;
 import kr.ac.dankook.VettAuthService.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,25 +27,38 @@ public class AuthController {
     private final AuthService authService;
     private final MemberService memberService;
     private final AuthCacheService authCacheService;
+    private final IdempotencyService idempotencyService;
 
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<ApiMessageResponse> signup(
-            @RequestBody @Valid SignupRequest signupRequest
+            @RequestBody @Valid SignupRequest signupRequest,
+            @RequestHeader("Idempotency-Key") String key
     ) {
-        authService.signup(signupRequest);
+        String res = idempotencyService.execute(
+                key,
+                () ->  authService.signup(signupRequest),
+                String.class
+        );
         return ResponseEntity.status(201)
-                .body(new ApiMessageResponse(true,201,"회원가입을 완료하였습니다."));
+                .body(new ApiMessageResponse(true,201,res));
     }
 
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponse>> login(
-            @RequestBody @Valid LoginRequest loginRequest
+            @RequestBody @Valid LoginRequest loginRequest,
+            @RequestHeader("Idempotency-Key") String key
     ){
+        TokenResponse res = idempotencyService.execute(
+                key,
+                () ->   authService.login(loginRequest),
+                TokenResponse.class
+        );
+
         return ResponseEntity.status(200)
                 .body(new ApiResponse<>(true,200,
-                        authService.login(loginRequest)));
+                        res));
     }
 
     // 아이디 중복 체크
@@ -68,12 +82,17 @@ public class AuthController {
     // 비밀번호 찾기를 위한 인증번호 전송
     @PostMapping("/find-password/certificate")
     public ResponseEntity<ApiResponse<String>> sendCertificateCode(
-            @RequestParam("userId") String userId
+            @RequestParam("userId") String userId,
+            @RequestHeader("Idempotency-Key") String key
     ){
         Member member = memberService.getCurrentMember(userId);
-        authService.sendCertificateCode(member);
+        String res = idempotencyService.execute(
+                key,
+                () ->   authService.sendCertificateCode(member),
+                String.class
+        );
         return ResponseEntity.status(201).body(new ApiResponse<>(true,200,
-                userId));
+                res));
     }
 
     // 인증번호 검사
@@ -103,9 +122,15 @@ public class AuthController {
     // 토큰 갱신
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<TokenResponse>> reissue(
-            @RequestParam("refreshToken") String refreshToken
+            @RequestParam("refreshToken") String refreshToken,
+            @RequestHeader("Idempotency-Key") String key
     ){
+        TokenResponse res = idempotencyService.execute(
+                key,
+                () ->   authService.reissueToken(refreshToken),
+                TokenResponse.class
+        );
         return ResponseEntity.status(201).body(new ApiResponse<>(true,200,
-                authService.reissueToken(refreshToken)));
+                res));
     }
 }

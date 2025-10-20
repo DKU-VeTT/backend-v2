@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import kr.ac.dankook.VettAuthService.error.ErrorResponse;
+import kr.ac.dankook.VettAuthService.log.LogMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtErrorResponseHandler {
 
     private final ObjectMapper objectMapper;
@@ -20,12 +23,22 @@ public class JwtErrorResponseHandler {
     public void sendErrorResponse(
             HttpServletResponse response, ErrorCode errorCode)
             throws IOException {
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         ErrorResponse errorResponse = new ErrorResponse(errorCode.getCode(),errorCode.getMessage());
         String body = objectMapper.writeValueAsString(errorResponse);
         int sc;
         if (errorCode == ErrorCode.ACCESS_DENIED) sc = 403;
         else if (errorCode == ErrorCode.INTERNAL_SERVER_ERROR) sc = 500;
         else sc = 401;
+
+        log.error(
+                "[{}, class={}, method={}, error={}]",
+                LogMessage.JWT_AUTHENTICATION_ERROR, className,methodName,body);
+
 
         response.setStatus(sc);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

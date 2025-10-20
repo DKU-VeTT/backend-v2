@@ -7,11 +7,11 @@ import java.util.Objects;
 
 public class LogErrorConverter {
 
-    public static LogError convertToLogError(Exception e, HttpServletRequest request){
+    public static LogError convertToLogError(Exception e, HttpServletRequest request) {
 
         String uri = request.getRequestURI();
         String userKey = (String) request.getAttribute("userKey");
-        String resultKey = Objects.requireNonNullElse(userKey, "DEFAULT");
+        String resultKey = Objects.requireNonNullElse(userKey, "NOT_USER");
 
         StackTraceElement[] stackTrace = e.getStackTrace();
 
