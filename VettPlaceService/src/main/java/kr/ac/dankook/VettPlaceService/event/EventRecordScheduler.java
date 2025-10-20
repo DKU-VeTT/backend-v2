@@ -2,6 +2,7 @@ package kr.ac.dankook.VettPlaceService.event;
 
 import jakarta.persistence.EntityManager;
 import kr.ac.dankook.VettPlaceService.entity.EventRecord;
+import kr.ac.dankook.VettPlaceService.log.LogMessage;
 import kr.ac.dankook.VettPlaceService.repository.EventRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +26,13 @@ public class EventRecordScheduler {
     @Scheduled(fixedDelay = 60000 * 10)
     @Transactional
     public void recordDeleteScheduler(){
-        log.info(
-                "[record_delete_scheduler, component={}, date={}]",
-                "EventRecordScheduler", LocalDateTime.now());
+
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+        log.info("[{}, class={}, method={}, date={}]",
+                LogMessage.RECORD_DELETE_SCHEDULER, className, methodName, LocalDateTime.now());
+
         entityManager.flush();
         List<EventRecord> oldRecords = eventRecordRepository.findOldRecordsByTimestamp(CLEANUP_SECONDS);
         eventRecordRepository.deleteAllInBatch(oldRecords);

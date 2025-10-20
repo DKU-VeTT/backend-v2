@@ -34,6 +34,10 @@ public class KakaoLocationService {
         String apiKey = "KakaoAK " + KAKAO_APP_KEY;
         RestClient restClient = RestClient.create();
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try{
             String responseBody = restClient.get()
                     .uri(uriBuilder -> uriBuilder
@@ -67,7 +71,7 @@ public class KakaoLocationService {
                     .desLongitude(desLongitude).desLatitude(desLatitude)
                     .taxiFare(taxiFare).tollFare(tollFare).distance(distance).time(duration).build();
         }catch(JSONException e){
-           throw new ExternalApiException("좌표 형식이 올바르지 않아 교통 정보를 받아올 수 없습니다. 다시 시도해주세요.", e.getMessage());
+           throw new ExternalApiException("좌표 형식이 올바르지 않아 교통 정보를 받아올 수 없습니다. 다시 시도해주세요.",className,methodName,e.getMessage());
         }catch (Exception e){
             String jsonPart = e.getMessage().split(": ", 2)[1];
             jsonPart = jsonPart.replaceAll("^\"|\"$", "");
@@ -75,14 +79,18 @@ public class KakaoLocationService {
 
             int errorCode = errorObject.getInt("code");
             String errorMsg = errorObject.getString("msg");
-            if (errorCode == -2) throw new ExternalApiException(errorMsg, e.getMessage());
-            throw new ExternalApiException("외부 호출에 문제가 생겼습니다. 나중에 다시 시도해주세요.",  e.getMessage());
+            if (errorCode == -2) throw new ExternalApiException(errorMsg, className,methodName,e.getMessage());
+            throw new ExternalApiException("외부 호출에 문제가 생겼습니다. 나중에 다시 시도해주세요.", className,methodName, e.getMessage());
         }
     }
     public CoordinateResponse getCoordinateByAddress(String address){
 
         String apiKey = "KakaoAK " + KAKAO_APP_KEY;
         RestClient restClient = RestClient.create();
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         try {
             String apiResponseBody = restClient.get()
                     .uri(uriBuilder -> uriBuilder
@@ -102,9 +110,9 @@ public class KakaoLocationService {
             return CoordinateResponse.builder()
                     .latitude(latitude).longitude(longitude).build();
         } catch (JSONException e) {
-            throw new ExternalApiException("주소 형식이 올바르지 않습니다. 다시 시도해주세요.", e.getMessage());
+            throw new ExternalApiException("주소 형식이 올바르지 않습니다. 다시 시도해주세요.",className,methodName, e.getMessage());
         } catch (Exception e){
-            throw new ExternalApiException("외부 호출에 문제가 생겼습니다. 나중에 다시 시도해주세요.", e.getMessage());
+            throw new ExternalApiException("외부 호출에 문제가 생겼습니다. 나중에 다시 시도해주세요.", className,methodName,e.getMessage());
         }
     }
 }

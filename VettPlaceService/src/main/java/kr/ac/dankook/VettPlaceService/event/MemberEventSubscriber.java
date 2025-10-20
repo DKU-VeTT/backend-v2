@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import kr.ac.dankook.VettPlaceService.entity.Bookmark;
+import kr.ac.dankook.VettPlaceService.log.LogMessage;
 import kr.ac.dankook.VettPlaceService.repository.BookmarkRepository;
 import kr.ac.dankook.VettPlaceService.repository.EventRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -38,22 +40,23 @@ public class MemberEventSubscriber {
 
         OutboxEvent event = objectMapper.readValue(payload, OutboxEvent.class);
 
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+
         String id = event.getId();
         if (eventRecordRepository.findById(id).isPresent()){
-            log.info(
-                    "[member_event_duplicated_send_ack_only, component={}, eventId={}]",
-                    "MemberEventSubscriber", id);
+            log.info("[{}, class={}, method={}, eventId={}]",
+                    LogMessage.MEMBER_EVENT_DUPLICATED_ACK_ONLY, className, methodName, LocalDateTime.now());
             ack.acknowledge();
             return;
         }
         eventRecordRepository.upsert(id);
 
-        log.info(
-                "[member_event_listened, component={}, topic={}, partitionKey={}, payload={}]",
-                "MemberEventSubscriber", topic, partitionKey, payload);
-        // 비즈니스 로직
-        String memberId = (String) event.getPayload().get("userKey");
+        log.info("[{}, class={}, method={}, topic={}, partitionKey={}, payload={}]",
+                LogMessage.MEMBER_EVENT_LISTENED, className, methodName, topic, partitionKey, payload);
 
+        String memberId = (String) event.getPayload().get("userKey");
         entityManager.flush();
         List<Bookmark> bookmarks = bookmarkRepository.findByMemberId(memberId);
         bookmarkRepository.deleteAllInBatch(bookmarks);
