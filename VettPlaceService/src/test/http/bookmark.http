@@ -4,8 +4,9 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyN
 Idempotency-Key: Idempotency
 
 ### Get Bookmark
-GET http://localhost:8080/api/v1/places/bookmark
+GET http://localhost:8080/api/v1/places/bookmark/1234
 Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyNzgiLCJleHAiOjE3NjM1NDc2OTAsImtleSI6InJsSHBhcFhJWDZ1T2hVTGpiVWdoSlEiLCJyb2xlIjoi7J2867CYIOyCrOyaqeyekCJ9.z7aIBvXgT2QvwfgdkLyD3KdktX7rfnMlwpT2XZJeIOpbT6-W59_WXwvtvpjLcMsKtQ9flgoMXhjDs_PBgic6SA
+
 
 ### Delete Bookmark
 DELETE http://localhost:8080/api/v1/places/bookmark/1

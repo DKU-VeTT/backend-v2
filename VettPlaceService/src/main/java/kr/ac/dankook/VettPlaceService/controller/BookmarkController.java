@@ -49,4 +49,11 @@ public class BookmarkController {
         return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
                 bookmarkService.getBookmarkListByMemberId(passport.getKey())));
     }
+
+    @GetMapping("/{placeId}")
+    public ResponseEntity<ApiResponse<Boolean>> isBookmark(@PassportMember Passport passport,@PathVariable Long placeId){
+         return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
+                 bookmarkService.isBookmark(placeId,passport.getKey())));
+    }
+
 }

@@ -22,6 +22,15 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final PlaceRepository placeRepository;
 
+    public boolean isBookmark(Long placeId,String memberId){
+        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        String className = classNames[classNames.length - 1];
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 장소를 찾을 수 없습니다.",className,methodName));
+        return bookmarkRepository.findByMemberIdAndPlace(memberId, place).isPresent();
+    }
+
     @Transactional
     public String saveBookmark(Long placeId,String memberId){
 
@@ -29,11 +38,11 @@ public class BookmarkService {
         String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
         String className = classNames[classNames.length - 1];
 
-        Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 장소를 찾을 수 없습니다.",className,methodName));
-        if (bookmarkRepository.findByMemberIdAndPlace(memberId,place).isPresent()){
+        if (isBookmark(placeId,memberId)){
             throw new CustomException(ErrorCode.ALREADY_ADD_BOOKMARK,className,methodName);
         }
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 장소를 찾을 수 없습니다.",className,methodName));
         Bookmark bookmark = Bookmark.builder()
                 .memberId(memberId).place(place).build();
         bookmarkRepository.save(bookmark);

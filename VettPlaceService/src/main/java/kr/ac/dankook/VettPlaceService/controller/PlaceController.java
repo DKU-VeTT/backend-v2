@@ -26,11 +26,9 @@ public class PlaceController {
     private final PlaceCacheService placeCacheService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PlaceResponse>>> getAllPlaces(
-        Pageable pageable
-    ) {
+    public ResponseEntity<ApiResponse<List<PlaceResponse>>> getAllPlaces() {
         return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
-                placeService.getAllPlace(pageable)));
+                placeService.getAllPlace()));
     }
 
     @GetMapping("/{id}")

@@ -26,9 +26,9 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final PlaceOperatingHourRepository placeOperatingHourRepository;
 
-    public List<PlaceResponse> getAllPlace(Pageable pageable){
+    public List<PlaceResponse> getAllPlace(){
         // Page original Entity
-        Page<Place> allPlaces = placeRepository.findAll(pageable);
+        List<Place> allPlaces = placeRepository.findAll();
         // PlaceIds Set
         Set<Long> placeIds = allPlaces.stream()
                 .map(Place::getId)
