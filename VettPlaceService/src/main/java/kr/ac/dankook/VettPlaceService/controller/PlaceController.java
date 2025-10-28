@@ -9,7 +9,6 @@ import kr.ac.dankook.VettPlaceService.service.PlaceCacheService;
 import kr.ac.dankook.VettPlaceService.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,5 +68,11 @@ public class PlaceController {
         return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
                 placeService.getPlaceByFilter(
                         category,regionCode,isParking,isOpen,isInside,isOutside)));
+    }
+
+    @GetMapping("/region")
+    public ResponseEntity<ApiResponse<List<String>>> getRegionCodes(){
+        return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
+                placeService.getRegionsCode()));
     }
 }

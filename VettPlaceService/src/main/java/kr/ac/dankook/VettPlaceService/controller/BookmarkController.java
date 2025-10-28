@@ -30,7 +30,6 @@ public class BookmarkController {
                 () -> bookmarkService.saveBookmark(placeId,passport.getKey()),
                  String.class
         );
-        bookmarkService.saveBookmark(placeId,passport.getKey());
         return ResponseEntity.status(201).body(new ApiMessageResponse(true,201,
                 res));
     }
@@ -51,7 +50,7 @@ public class BookmarkController {
     }
 
     @GetMapping("/{placeId}")
-    public ResponseEntity<ApiResponse<Boolean>> isBookmark(@PassportMember Passport passport,@PathVariable Long placeId){
+    public ResponseEntity<ApiResponse<Long>> isBookmark(@PassportMember Passport passport,@PathVariable Long placeId){
          return ResponseEntity.status(200).body(new ApiResponse<>(true,200,
                  bookmarkService.isBookmark(placeId,passport.getKey())));
     }

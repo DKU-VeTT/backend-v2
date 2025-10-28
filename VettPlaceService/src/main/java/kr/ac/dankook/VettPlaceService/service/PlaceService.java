@@ -26,6 +26,10 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final PlaceOperatingHourRepository placeOperatingHourRepository;
 
+    public List<String> getRegionsCode(){
+        return placeRepository.findDistinctRegionCode();
+    }
+
     public List<PlaceResponse> getAllPlace(){
         // Page original Entity
         List<Place> allPlaces = placeRepository.findAll();

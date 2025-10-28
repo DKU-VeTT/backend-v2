@@ -14,6 +14,9 @@ import java.util.Set;
 @Repository
 public interface PlaceRepository extends JpaRepository<Place, Long> {
 
+    @Query("select distinct p.regionCode from Place p")
+    List<String> findDistinctRegionCode();
+
     // Required index
     @Query("""
         SELECT distinct p FROM Place p
