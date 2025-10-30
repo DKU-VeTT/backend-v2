@@ -1,0 +1,93 @@
+spring:
+  application:
+    name: Vett-Observability-Service
+
+  config:
+    activate:
+      on-profile: local
+    import: optional:file:.env[.properties]
+
+  elasticsearch:
+    uris: ${ELASTIC_SEARCH_URI}
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      observation-enabled: true
+    consumer:
+      enable-auto-commit: false
+    template:
+      observation-enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics,info"
+      cors:
+        allow-credentials: true
+        allowed-origins: ${APP_CLIENT_LOCAL_DOMAIN}, ${APP_CLIENT_PROD_DOMAIN}
+        allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+        allowed-headers: "*"
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      percentiles:
+        http:
+          server:
+            requests: 0.95,0.99
+    enable:
+      all: true
+  health:
+    elasticsearch:
+      enabled: false
+
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      consume: b3
+      produce: b3_multi
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_SERVICE_URL}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVICE_URL}
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME}
+
+logstash:
+  host: ${LOGSTASH_HOST}
+
+server:
+  port: 8087
+  servlet:
+    session:
+      timeout: 60m
+      persistent: true
+
+app:
+  domain:
+    client:
+      local: ${APP_CLIENT_LOCAL_DOMAIN}
+      prod: ${APP_CLIENT_PROD_DOMAIN}
+  secret:
+    jwt : ${APP_JWT_SECRET}
+    entity: ${APP_ENTITY_SECRET}
+    algorithm:
+      entity: ${APP_ENTITY_ENCRYPT_ALGORITHM}
