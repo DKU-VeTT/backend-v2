@@ -37,11 +37,14 @@ spring:
               uri: http://127.0.0.1:8085
               predicates:
                 - Path=/api/v1/ai/**
+            - id: vett-observability-service
+              uri: lb://VETT-OBSERVABILITY-SERVICE
+              predicates:
+                - Path=/api/v1/observability/**
 
           default-filters: DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
           observability:
             enabled: true
-
 
 resilience4j:
   circuitbreaker:
@@ -76,6 +79,19 @@ management:
     web:
       exposure:
         include: "health,metrics,info,prometheus"
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      percentiles:
+        http:
+          server:
+            requests: 0.95,0.99
+    enable:
+      all: true
+
   endpoint:
     health:
       show-details: always

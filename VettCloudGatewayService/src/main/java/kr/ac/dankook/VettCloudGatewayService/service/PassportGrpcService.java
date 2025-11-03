@@ -4,7 +4,6 @@ import kr.ac.dankook.Passport;
 import kr.ac.dankook.PassportServiceGrpc;
 import kr.ac.dankook.VettCloudGatewayService.error.CustomException;
 import kr.ac.dankook.VettCloudGatewayService.error.ErrorCode;
-import kr.ac.dankook.VettCloudGatewayService.log.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
