@@ -13,6 +13,8 @@ spring:
     elasticsearch:
       repositories:
         enabled: true
+    mongodb:
+      uri: ${MONGODB_URI}
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
@@ -36,6 +38,7 @@ management:
         allowed-origins: ${APP_CLIENT_LOCAL_DOMAIN}, ${APP_CLIENT_PROD_DOMAIN}
         allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
         allowed-headers: "*"
+
   metrics:
     distribution:
       percentiles-histogram:
@@ -82,12 +85,5 @@ server:
       persistent: true
 
 app:
-  domain:
-    client:
-      local: ${APP_CLIENT_LOCAL_DOMAIN}
-      prod: ${APP_CLIENT_PROD_DOMAIN}
   secret:
-    jwt : ${APP_JWT_SECRET}
-    entity: ${APP_ENTITY_SECRET}
-    algorithm:
-      entity: ${APP_ENTITY_ENCRYPT_ALGORITHM}
+    passport: ${APP_PASSPORT_SECRET}

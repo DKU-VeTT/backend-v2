@@ -38,12 +38,11 @@ dependencies {
 	implementation 'io.micrometer:micrometer-observation'
 
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
-
-	// Elastic search health error
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.json:json:20231013'
 	implementation 'com.github.ben-manes.caffeine:caffeine'
 	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'
-
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'

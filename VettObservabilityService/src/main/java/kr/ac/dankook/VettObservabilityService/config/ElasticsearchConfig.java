@@ -39,7 +39,6 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
                 (u.getPort() == -1 ? 9200 : u.getPort()),
                 (u.getScheme() == null ? "http" : u.getScheme())
         );
-
         RestClient low = RestClient.builder(httpHost).build();
         return new ElasticsearchClient(new RestClientTransport(low,new JacksonJsonpMapper()));
     }
