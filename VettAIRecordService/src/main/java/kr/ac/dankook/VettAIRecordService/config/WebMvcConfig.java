@@ -1,6 +1,7 @@
 package kr.ac.dankook.VettAIRecordService.config;
 
 import kr.ac.dankook.VettAIRecordService.interceptor.AuthenticationInterceptor;
+import kr.ac.dankook.VettAIRecordService.interceptor.MdcInterceptor;
 import kr.ac.dankook.VettAIRecordService.util.DecryptConverter;
 import kr.ac.dankook.VettAIRecordService.util.PassportMemberArgumentResolver;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final PassportMemberArgumentResolver passportMemberArgumentResolver;
     private final AuthenticationInterceptor authenticationInterceptor;
+    private final MdcInterceptor mdcInterceptor;
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
@@ -32,6 +34,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor)
+                .order(0)
+                .excludePathPatterns("/actuator/**")
+                .addPathPatterns("/**");
+
+        registry.addInterceptor(mdcInterceptor)
+                .order(1)
+                .excludePathPatterns("/actuator/**")
                 .addPathPatterns("/**");
     }
 }

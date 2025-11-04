@@ -13,10 +13,8 @@ import java.util.Map;
 @Setter
 @Getter
 public class OutboxEvent {
-
     private String id;
     private String eventDomain;
-    private String eventType;
-    @JsonProperty("payload")
-    private Map<String,Object> payload;
+    private String eventTopic;
+    private String userKey;
 }

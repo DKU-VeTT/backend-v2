@@ -44,21 +44,16 @@ public class DiagnosisController {
             @RequestHeader("Idempotency-Key") String key,
             @PassportMember Passport passport
     ){
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         if (file == null){
-            throw new CustomException(ErrorCode.INVALID_REQUEST_PARAM,className,methodName);
+            throw new CustomException(ErrorCode.INVALID_REQUEST_PARAM);
         }
-        String res = idempotencyService.execute(
-                key,
-                () -> diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey()),
-                String.class
-        );
+        idempotencyService.execute(key, () -> {
+            diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey());
+            return null;
+        });
         diagnosisFacade.saveDiagnosisResult(file,data,passport.getKey());
         return ResponseEntity.status(201).body(new ApiMessageResponse(true,201,
-                res));
+                "진단 결과를 성공적으로 저장 완료하였습니다."));
     }
 
     @DeleteMapping("/{id}")

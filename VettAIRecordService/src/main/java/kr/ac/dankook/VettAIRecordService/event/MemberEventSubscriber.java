@@ -20,8 +20,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -47,16 +45,11 @@ public class MemberEventSubscriber {
             Acknowledgment ack) throws JsonProcessingException {
 
         OutboxEvent event = objectMapper.readValue(payload, OutboxEvent.class);
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         String id = event.getId();
         // 현재 Id로 이미 실행된 이벤트가 있는지 확인
         if (eventRecordRepository.findById(id).isPresent()){
-            log.info("[{}, class={}, method={}, eventId={}]",
-                    LogMessage.MEMBER_EVENT_DUPLICATED_ACK_ONLY, className, methodName, LocalDateTime.now());
+            log.info("{}, CLASS={}, METHOD={}, EVENT_ID={}",
+                    LogMessage.MEMBER_EVENT_DUPLICATED_ACK_ONLY, "MemberEventSubscriber", "consumeMemberDeleted", id);
             ack.acknowledge();
             return;
         }
@@ -67,10 +60,12 @@ public class MemberEventSubscriber {
         // 따라서 timestamp 기반으로 스케쥴러에서 해당 레코드를 삭제해야한다.
         eventRecordRepository.upsert(id);
 
-        log.info("[{}, class={}, method={}, topic={}, partitionKey={}, payload={}]",
-                LogMessage.MEMBER_EVENT_LISTENED, className, methodName, topic, partitionKey, payload);
+        log.info("{}, CLASS={}, METHOD={}, TOPIC={}, PARTITION_KEY={}, PAYLOAD={}",
+                LogMessage.MEMBER_EVENT_LISTENED, "MemberEventSubscriber", "consumeMemberDeleted",
+                topic, partitionKey, payload);
+
         // 비즈니스 로직
-        String ownerId = (String) event.getPayload().get("userKey");
+        String ownerId = event.getUserKey();
         List<ChatBotRoom> chatBotRooms = chatBotRoomRepository.findChatBotRoomByOwnerId(ownerId);
         chatBotRooms.forEach(i -> chatBotRoomService.deleteChatBotRoom(EncryptionUtil.encrypt(i.getId())));
 

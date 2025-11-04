@@ -23,12 +23,8 @@ public class DiagnosisService {
     private final ApplicationEventPublisher eventPublisher;
 
     public Diagnosis getDiagnosisById(Long id) {
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         return diagnosisRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("진단 결과가 존재하지 않습니다.",className,methodName));
+                .orElseThrow(() -> new EntityNotFoundException("진단 결과가 존재하지 않습니다."));
     }
 
     public List<DiagnosisResultResponse> getDiagnosisResults(String memberId){

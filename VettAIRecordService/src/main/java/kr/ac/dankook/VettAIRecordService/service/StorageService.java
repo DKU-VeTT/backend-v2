@@ -2,6 +2,7 @@ package kr.ac.dankook.VettAIRecordService.service;
 
 import kr.ac.dankook.VettAIRecordService.error.ErrorCode;
 import kr.ac.dankook.VettAIRecordService.error.exception.CustomException;
+import kr.ac.dankook.VettAIRecordService.log.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -21,11 +22,6 @@ public class StorageService {
     private final GridFsTemplate gridFsTemplate;
 
     public String uploadFile(MultipartFile file) {
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         try (var in = file.getInputStream()) {
             var contentType = Optional.of(file.getContentType()).orElse("application/octet-stream");
             var meta = new org.bson.Document("contentType", contentType);
@@ -33,10 +29,10 @@ public class StorageService {
                     .store(in, file.getOriginalFilename(), contentType, meta)
                     .toHexString();
         } catch (Exception e) {
-            String metaData = "FILENAME : " + file.getOriginalFilename() +
-                    "TYPE : " + file.getContentType() +
-                    "ERROR : " + e.getMessage();
-            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR,className,methodName, metaData);
+            log.error("{}, CLASS={}, METHOD={}, FILENAME={}, TYPE={}, ERROR={}",
+                    LogMessage.FILE_PROCESSING_ERROR, "StorageService", "uploadFile",
+                    file.getOriginalFilename(), file.getContentType(), e.getMessage());
+            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
         }
     }
 
@@ -46,15 +42,13 @@ public class StorageService {
     }
 
     public void deleteFile(ObjectId id){
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         try{
             gridFsTemplate.delete(getQueryById(id));
         }catch (Exception e){
-            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR,className,methodName, e.getMessage());
+            log.error("{}, CLASS={}, METHOD={}, ID={}, ERROR={}",
+                    LogMessage.FILE_PROCESSING_ERROR, "StorageService", "deleteFile",
+                    id.toHexString(), e.getMessage());
+            throw new CustomException(ErrorCode.FILE_PROCESSING_ERROR);
         }
     }
 

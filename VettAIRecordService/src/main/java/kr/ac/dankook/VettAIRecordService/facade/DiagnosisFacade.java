@@ -18,10 +18,9 @@ public class DiagnosisFacade {
     private final DiagnosisService diagnosisService;
     private final StorageService storageService;
 
-    public String saveDiagnosisResult(MultipartFile file, DiagnosisResultRequest data, String memberId){
+    public void saveDiagnosisResult(MultipartFile file, DiagnosisResultRequest data, String memberId){
         String imageId = storageService.uploadFile(file);
         diagnosisService.saveDiagnosisEntity(imageId,memberId,data);
-        return "진단 결과를 성공적으로 저장 완료하였습니다.";
     }
 
     public void deleteDiagnosisResult(Long id){

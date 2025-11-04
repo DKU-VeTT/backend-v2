@@ -43,13 +43,9 @@ public class ChatBotRoomService {
 
     @Transactional
     public boolean updateChatBotRoom(String sessionId,String title){
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         Long decryptId = EncryptionUtil.decrypt(sessionId);
         ChatBotRoom chatBotRoom = chatBotRoomRepository.findById(decryptId)
-                .orElseThrow(() -> new EntityNotFoundException("챗봇방 정보를 찾을 수 없습니다.",className,methodName));
+                .orElseThrow(() -> new EntityNotFoundException("챗봇방 정보를 찾을 수 없습니다."));
         chatBotRoom.updateTitle(title);
         chatBotRoomRepository.save(chatBotRoom);
         return true;

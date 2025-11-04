@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class SendChatEventSubscriber {
+public class ChatEventSubscriber {
 
     public static final String CHAT_TOPIC = "chat.room.event.message";
     private final static String DESTINATION_PREFIX = "/sub/chat/room/";
@@ -35,8 +35,8 @@ public class SendChatEventSubscriber {
             acknowledgment.acknowledge();
         }catch(Exception e){
             log.error(
-                    "[{}, class={}, method={}, message={}, error={}]",
-                    LogMessage.KAFKA_LISTENER_EXCEPTION,className,methodName, message, e.getMessage());
+                "[{}, class={}, method={}, message={}, error={}]",
+                LogMessage.KAFKA_LISTENER_EXCEPTION,className,methodName, message, e.getMessage());
         }
     }
 }
