@@ -51,7 +51,31 @@ eureka:
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME}
 
+
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics,info"
+      cors:
+        allow-credentials: true
+        allowed-origins: ${APP_CLIENT_LOCAL_DOMAIN}, ${APP_CLIENT_PROD_DOMAIN}
+        allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+        allowed-headers: "*"
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      percentiles:
+        http:
+          server:
+            requests: 0.95,0.99
+    enable:
+      all: true
+
   tracing:
     sampling:
       probability: 1.0
@@ -71,6 +95,7 @@ server:
     session:
       timeout: 60m
       persistent: true
+
 
 app:
   secret:

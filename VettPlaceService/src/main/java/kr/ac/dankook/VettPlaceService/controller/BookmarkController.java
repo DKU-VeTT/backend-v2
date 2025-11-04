@@ -25,13 +25,12 @@ public class BookmarkController {
             @PassportMember Passport passport,
             @RequestHeader("Idempotency-Key") String key,
             @PathVariable Long placeId){
-         String res = idempotencyService.execute(
-                key,
-                () -> bookmarkService.saveBookmark(placeId,passport.getKey()),
-                 String.class
-        );
+        idempotencyService.execute(key, () -> {
+            bookmarkService.saveBookmark(placeId, passport.getKey());
+            return null;
+        });
         return ResponseEntity.status(201).body(new ApiMessageResponse(true,201,
-                res));
+                "즐겨찾기 등록에 성공하였습니다."));
     }
 
     @DeleteMapping("/{bookmarkId}")

@@ -5,14 +5,7 @@ import lombok.Getter;
 @Getter
 public class ExternalApiException extends RuntimeException{
 
-    private final String className;
-    private final String methodName;
-    private String detailMessage = "NONE";
-
-    public ExternalApiException(String message,String className, String methodName,String detailMessage){
+    public ExternalApiException(String message){
         super(message);
-        this.className = className;
-        this.methodName = methodName;
-        this.detailMessage = detailMessage;
     }
 }

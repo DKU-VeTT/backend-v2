@@ -24,42 +24,30 @@ public class BookmarkService {
     private final PlaceRepository placeRepository;
 
     public Long isBookmark(Long placeId,String memberId){
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
         Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 장소를 찾을 수 없습니다.",className,methodName));
+                .orElseThrow(() -> new EntityNotFoundException("해당 장소를 찾을 수 없습니다."));
         Optional<Bookmark> bookmark = bookmarkRepository.findByMemberIdAndPlace(memberId, place);
         return bookmark.map(Bookmark::getId).orElse(null);
     }
 
     @Transactional
-    public String saveBookmark(Long placeId,String memberId){
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
+    public void saveBookmark(Long placeId,String memberId){
         if (isBookmark(placeId,memberId) != null){
-            throw new CustomException(ErrorCode.ALREADY_ADD_BOOKMARK,className,methodName);
+            throw new CustomException(ErrorCode.ALREADY_ADD_BOOKMARK);
         }
         Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 장소를 찾을 수 없습니다.",className,methodName));
+                .orElseThrow(() -> new EntityNotFoundException("해당 장소를 찾을 수 없습니다."));
         Bookmark bookmark = Bookmark.builder()
                 .memberId(memberId).place(place).build();
         bookmarkRepository.save(bookmark);
-        return "즐겨찾기 등록에 성공하였습니다.";
     }
 
     public void deleteBookmark(String memberId, Long bookmarkId){
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
-                        .orElseThrow(() -> new EntityNotFoundException("즐겨찾기 내역이 존재하지 않습니다.",className,methodName));
+                        .orElseThrow(() -> new EntityNotFoundException("즐겨찾기 내역이 존재하지 않습니다."));
         if (!bookmark.getMemberId().equals(memberId)){
-            throw new CustomException(ErrorCode.ACCESS_DENIED,className,methodName);
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
         bookmarkRepository.deleteById(bookmarkId);
     }
