@@ -7,7 +7,6 @@ import kr.ac.dankook.VettAuthService.dto.request.MemberPasswordChangeRequest;
 import kr.ac.dankook.VettAuthService.dto.response.ApiMessageResponse;
 import kr.ac.dankook.VettAuthService.dto.response.ApiResponse;
 import kr.ac.dankook.VettAuthService.dto.response.MemberResponse;
-import kr.ac.dankook.VettAuthService.dto.response.TokenResponse;
 import kr.ac.dankook.VettAuthService.service.AuthService;
 import kr.ac.dankook.VettAuthService.service.IdempotencyService;
 import kr.ac.dankook.VettAuthService.service.MemberService;
@@ -39,14 +38,14 @@ public class MemberController {
     @PostMapping("/logout")
     public ResponseEntity<ApiMessageResponse> logout(
             @AuthenticationPrincipal PrincipalDetails user,
-            @RequestHeader("Idempotency-Key") String key){
-        String res = idempotencyService.execute(
-                key,
-                () ->  authService.logout(user.getUsername()),
-                String.class
-        );
+            @RequestHeader("Idempotency-Key") String key) {
+
+        idempotencyService.execute(key, () -> {
+            authService.logout(user.getUsername());
+            return null;
+        });
         return ResponseEntity.status(200).body(new ApiMessageResponse(true,200,
-                res));
+                "로그아웃에 성공하였습니다."));
     }
 
     @PatchMapping("/password")

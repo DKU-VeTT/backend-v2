@@ -14,7 +14,6 @@ import static kr.ac.dankook.VettAuthService.jwt.JwtTokenProvider.REFRESH_TOKEN_E
 @Slf4j
 public class AuthCacheService {
 
-    // 인증메일 15분동안 유효
     private static final long CERTIFICATE_EXPIRE_TIME = 1000 * 60 * 15;
     private final RedisTemplate<String,String> redisTemplate;
 

@@ -18,9 +18,9 @@ public class Outbox{
     @Column(nullable = false)
     private String eventDomain;
 
-    // Type : "user.event.deleted"
+    // Topic : "user.event.deleted"
     @Column(nullable = false)
-    private String eventType;
+    private String eventTopic;
 
     // Payload : "{ key : "" ...  }"
     @Lob
@@ -32,16 +32,14 @@ public class Outbox{
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-
-
     @Enumerated(EnumType.STRING)
     private OutboxStatus status;
 
     @Builder
-    public Outbox(String id, String eventDomain, String eventType, String payload,String partitionKey,OutboxStatus status) {
+    public Outbox(String id, String eventDomain, String eventTopic, String payload,String partitionKey,OutboxStatus status) {
         this.id = id;
         this.eventDomain = eventDomain;
-        this.eventType = eventType;
+        this.eventTopic = eventTopic;
         this.payload = payload;
         this.partitionKey = partitionKey;
         this.timestamp = LocalDateTime.now();

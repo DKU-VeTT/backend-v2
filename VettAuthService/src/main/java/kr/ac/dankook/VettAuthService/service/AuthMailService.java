@@ -26,11 +26,6 @@ public class AuthMailService {
 
     @Async
     public void sendMail(MailRequest mailRequest){
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         try{
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true,"UTF-8");
@@ -42,11 +37,14 @@ public class AuthMailService {
             helper.setReplyTo(adminMailAddress);
 
             mailSender.send(mimeMessage);
-            log.info("[{}, class={}, method={}, mailTo={}]",
-                    LogMessage.SUCCESS_SEND_MAIL, className, methodName,  mailRequest.getEmail());
-
+            log.info("{}, CLASS={}, METHOD={}, MAIL_TO={}",
+                    LogMessage.SUCCESS_SEND_MAIL, "AuthMailService", "sendMail",
+                    mailRequest.getEmail());
         }catch (MessagingException e){
-            throw new CustomException(ErrorCode.CERTIFICATE_SEND_MAIL_ERROR,className,methodName,e.getMessage());
+            log.error("{}, CLASS={}, METHOD={}, ERROR={}",
+                    LogMessage.FAILED_SEND_MAIL, "AuthMailService", "sendMail",
+                    e.getMessage());
+            throw new CustomException(ErrorCode.CERTIFICATE_SEND_MAIL_ERROR);
         }
     }
 

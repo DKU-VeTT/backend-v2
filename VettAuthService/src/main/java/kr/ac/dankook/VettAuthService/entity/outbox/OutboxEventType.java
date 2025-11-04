@@ -10,5 +10,5 @@ public enum OutboxEventType {
     USER_DELETED("USER","user.event.deleted");
 
     private final String eventDomain;
-    private final String eventType;
+    private final String eventTopic;
 }

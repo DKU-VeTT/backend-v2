@@ -17,12 +17,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -34,12 +31,8 @@ public class MemberService {
 
     public Member getCurrentMember(String userId){
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         return memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND,className,methodName, "USER ID : " + userId));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     @Transactional
@@ -65,24 +58,13 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(Member member) {
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         // Outbox 저장
         String userKey = EncryptionUtil.encrypt(member.getId());
 
-        log.info("[{}, class={}, method={}, userKey={}]", LogMessage.MEMBER_DELETED,className,methodName,
-                userKey);
-
-        Map<String,String> payloadMap = new HashMap<>();
-        payloadMap.put("userKey",userKey);
-
-        Outbox outbox = outboxService.makeOutbox(payloadMap, OutboxEventType.USER_DELETED, userKey);
+        Outbox outbox = outboxService.makeMemberOutbox(OutboxEventType.USER_DELETED, userKey);
         outboxRepository.save(outbox);
-        // Member 저장
-        // member.convertToDeletedMember();
+
+        member.convertToDeletedMember();
         memberRepository.save(member);
         // Outbox 이벤트 발행
         eventPublisher.publishEvent(new OutboxEvent(outbox, snapshotFactory.captureAll()));

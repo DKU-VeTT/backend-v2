@@ -21,10 +21,10 @@ public class OutboxEventHandler {
     public void handlePublishEvent(OutboxEvent event){
         try (var scope = event.getSnapshot().setThreadLocals()) {
             String id = event.getId();
-            String eventType = event.getEventType();
+            String eventTopic = event.getEventTopic();
             String payload = event.getPayload();
             String partitionKey = event.getPartitionKey();
-            outboxEventPublisher.publishOutboxEvent(id,eventType,partitionKey,payload);
+            outboxEventPublisher.publishOutboxEvent(id,eventTopic,partitionKey,payload);
         }
     }
 }

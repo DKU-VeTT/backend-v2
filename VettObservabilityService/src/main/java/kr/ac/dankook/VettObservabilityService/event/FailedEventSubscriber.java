@@ -12,13 +12,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DltEventSubscriber {
+public class FailedEventSubscriber {
 
-    @KafkaListener(
-            groupId = "VETT_OBSERVATION",
-            topicPattern = ".*\\.dlt"
-    )
-    public void consumeDtlRecord(@Payload String payload,
+    @KafkaListener(groupId = "VETT_OBSERVATION", topicPattern = ".*\\.dlt")
+    public void consumeDTLRecord(@Payload String payload,
                                  @Header(KafkaHeaders.RECEIVED_KEY) String partitionKey,
                                  @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                  @Header("error-class") String errorClass,
@@ -27,5 +24,10 @@ public class DltEventSubscriber {
         log.info("DLT Record {} {} {}",payload,partitionKey,topic);
         log.info("Error Info {} {}",errorClass,errorMessage);
         ack.acknowledge();
+    }
+
+    @KafkaListener(groupId = "VETT_OBSERVATION", topics = "")
+    public void consumeFailPublishRecord(){
+
     }
 }

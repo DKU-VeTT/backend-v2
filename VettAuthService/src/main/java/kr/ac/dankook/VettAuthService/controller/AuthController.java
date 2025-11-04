@@ -13,14 +13,12 @@ import kr.ac.dankook.VettAuthService.service.AuthService;
 import kr.ac.dankook.VettAuthService.service.IdempotencyService;
 import kr.ac.dankook.VettAuthService.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
@@ -35,13 +33,12 @@ public class AuthController {
             @RequestBody @Valid SignupRequest signupRequest,
             @RequestHeader("Idempotency-Key") String key
     ) {
-        String res = idempotencyService.execute(
-                key,
-                () ->  authService.signup(signupRequest),
-                String.class
-        );
+        idempotencyService.execute(key, () -> {
+            authService.signup(signupRequest);
+            return null;
+        });
         return ResponseEntity.status(201)
-                .body(new ApiMessageResponse(true,201,res));
+                .body(new ApiMessageResponse(true,201,"회원가입을 완료하였습니다."));
     }
 
     // 로그인
@@ -55,7 +52,6 @@ public class AuthController {
                 () ->   authService.login(loginRequest),
                 TokenResponse.class
         );
-
         return ResponseEntity.status(200)
                 .body(new ApiResponse<>(true,200,
                         res));

@@ -3,6 +3,7 @@ package kr.ac.dankook.VettAuthService.config.principal;
 import kr.ac.dankook.VettAuthService.entity.Member;
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import kr.ac.dankook.VettAuthService.error.exception.CustomException;
+import kr.ac.dankook.VettAuthService.log.LogMessage;
 import kr.ac.dankook.VettAuthService.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +22,11 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         Optional<Member> memberEntity = memberRepository.findByUserId(username);
-        return memberEntity.map(PrincipalDetails::new)
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_CREDENTIAL,className,methodName,"USER ID : " + username));
+        if (memberEntity.isEmpty()){
+            log.warn("{}, CLASS={}, METHOD={}", LogMessage.MEMBER_NOT_FOUND, "PrincipalDetailsService", "loadUserByUsername");
+            throw new CustomException(ErrorCode.BAD_CREDENTIAL);
+        }
+        return new PrincipalDetails(memberEntity.get());
     }
 }

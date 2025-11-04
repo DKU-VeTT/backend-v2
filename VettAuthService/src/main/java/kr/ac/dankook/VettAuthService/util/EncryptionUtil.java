@@ -2,6 +2,7 @@ package kr.ac.dankook.VettAuthService.util;
 
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import kr.ac.dankook.VettAuthService.error.exception.CustomException;
+import kr.ac.dankook.VettAuthService.log.LogMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,11 +29,6 @@ public class EncryptionUtil {
     }
 
     public static String encrypt(Long value) {
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         try{
             SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY, ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -41,16 +37,14 @@ public class EncryptionUtil {
             byte[] encryptedData = cipher.doFinal(valueBytes);
             return Base64.getUrlEncoder().withoutPadding().encodeToString(encryptedData);
         }catch (Exception e){
-            throw new CustomException(ErrorCode.INVALID_ENCRYPT_PK,className,methodName,e.getMessage());
+            log.error("{}, CLASS={}, METHOD={}, VALUE={}",
+                    LogMessage.ENCRYPT_ENTITY_ERROR, "EncryptionUtil", "encrypt",
+                    value);
+            throw new CustomException(ErrorCode.INVALID_ENCRYPT_PK);
         }
     }
 
     public static Long decrypt(String encryptedData) {
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         try{
             SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY, ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -59,7 +53,10 @@ public class EncryptionUtil {
             byte[] decryptedBytes = cipher.doFinal(decodedData);
             return ByteBuffer.wrap(decryptedBytes).getLong();
         }catch (Exception e){
-            throw new CustomException(ErrorCode.INVALID_ENCRYPT_PK,className,methodName,e.getMessage());
+            log.error("{}, CLASS={}, METHOD={}, DATA={}",
+                    LogMessage.DECRYPT_ENTITY_ERROR, "EncryptionUtil", "decrypt",
+                    encryptedData);
+            throw new CustomException(ErrorCode.INVALID_ENCRYPT_PK);
         }
     }
 }

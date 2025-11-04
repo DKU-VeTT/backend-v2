@@ -6,11 +6,9 @@ import kr.ac.dankook.VettAuthService.entity.outbox.OutboxStatus;
 import kr.ac.dankook.VettAuthService.log.LogMessage;
 import kr.ac.dankook.VettAuthService.repository.OutboxRepository;
 import kr.ac.dankook.VettAuthService.service.OutboxCacheService;
-import kr.ac.dankook.VettAuthService.service.OutboxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +24,7 @@ public class OutboxEventScheduling {
 
     private final OutboxRepository outboxRepository;
     private final OutboxEventPublisher outboxEventPublisher;
-    private final OutboxService outboxService;
+    private final FailedEventPublisher failedEventPublisher;
     private final OutboxCacheService outboxCacheService;
     private final EntityManager entityManager;
     private final RetryTemplate retryTemplate;
@@ -34,41 +32,40 @@ public class OutboxEventScheduling {
     @Scheduled(fixedDelay = 60000 * 5) // 5 minute
     public void retryPublishEvent() {
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-        log.info("[{}, class={}, method={}, date={}]",
-                LogMessage.RETRY_PUBLISH_EVENT, className, methodName, LocalDateTime.now());
+        log.info("{}, CLASS={}, METHOD={}, DATE={}",
+                LogMessage.RETRY_PUBLISH_EVENT, "OutboxEventScheduling", "retryPublishEvent",
+                LocalDateTime.now());
 
-
-        List<Outbox> outboxes = outboxRepository.findByStatusIn(List.of(OutboxStatus.READY_TO_PUBLISH,OutboxStatus.FAILED));
+        List<Outbox> outboxes = outboxRepository.findByStatusIn(
+                List.of(OutboxStatus.READY_TO_PUBLISH,OutboxStatus.FAILED));
         for (Outbox outbox : outboxes) {
             String id = outbox.getId();
-            String eventType = outbox.getEventType();
+            String eventTopic = outbox.getEventTopic();
             String payload = outbox.getPayload();
             String partitionKey = outbox.getPartitionKey();
-            // 최대 3번 다시 시도
             retryTemplate.execute(ctx -> {
-                outboxEventPublisher.publishOutboxEvent(id,eventType,partitionKey,payload);
+                outboxEventPublisher.publishOutboxEvent(id, eventTopic, partitionKey, payload);
                 return null;
             }, ctx -> {
-                log.error("[{}, class={}, method={}, id={}, attempts={}]",
-                        LogMessage.RETRY_PUBLISH_EVENT_EXHAUSTED, className, methodName, id,ctx.getRetryCount());
+                Throwable lastError = ctx.getLastThrowable();
+                String lastErrorMessage = lastError != null ? lastError.getMessage() : "Unknown Error";
+                log.error("[{}, id={}, attempts={} lastError={}]",
+                        LogMessage.RETRY_PUBLISH_EVENT_EXHAUSTED, id, ctx.getRetryCount(),
+                        lastErrorMessage);
                 outboxCacheService.deleteOutboxId(id);
-                outboxService.convertOutboxStatus(id, OutboxStatus.PERMANENT_FAILURE);
+                failedEventPublisher.sendFailedEvent(eventTopic,"OutboxEventScheduling", partitionKey, payload, lastErrorMessage);
                 return null;
             });
         }
     }
 
-    @Scheduled(fixedDelay = 60000 * 10) // 10 minute
+    @Scheduled(fixedDelay = 60000 * 10)
     @Transactional
     public void removePublishedEvents(){
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-        log.info("[{}, class={}, method={}, date={}]",
-                LogMessage.REMOVE_PUBLISHED_EVENT, className, methodName, LocalDateTime.now());
+
+        log.info("{}, CLASS={}, METHOD={}, DATE={}",
+                LogMessage.REMOVE_PUBLISHED_EVENT, "OutboxEventScheduling", "removePublishedEvents",
+                LocalDateTime.now());
 
         List<Outbox> outboxes = outboxRepository.findByStatusIn(List.of(OutboxStatus.PUBLISHED));
         Set<String> outboxIds = outboxes.stream().map(Outbox::getId).collect(Collectors.toSet());
@@ -76,5 +73,6 @@ public class OutboxEventScheduling {
         outboxRepository.deleteAllInBatch(outboxes);
         outboxCacheService.deleteOutboxId(outboxIds);
         entityManager.clear();
+
     }
 }

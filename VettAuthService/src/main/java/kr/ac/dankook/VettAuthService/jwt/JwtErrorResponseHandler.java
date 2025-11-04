@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -24,10 +25,6 @@ public class JwtErrorResponseHandler {
             HttpServletResponse response, ErrorCode errorCode)
             throws IOException {
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         ErrorResponse errorResponse = new ErrorResponse(errorCode.getCode(),errorCode.getMessage());
         String body = objectMapper.writeValueAsString(errorResponse);
         int sc;
@@ -35,11 +32,9 @@ public class JwtErrorResponseHandler {
         else if (errorCode == ErrorCode.INTERNAL_SERVER_ERROR) sc = 500;
         else sc = 401;
 
-        log.error(
-                "[{}, class={}, method={}, error={}]",
-                LogMessage.JWT_AUTHENTICATION_ERROR, className,methodName,body);
-
-
+        log.error("{}, CLASS={}, METHOD={}, ERROR={}",
+                LogMessage.JWT_AUTHENTICATION_ERROR, "JwtErrorResponseHandler", "sendErrorResponse",
+                body);
         response.setStatus(sc);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

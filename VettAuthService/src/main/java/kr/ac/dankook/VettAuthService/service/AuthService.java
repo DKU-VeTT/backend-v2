@@ -65,14 +65,9 @@ public class AuthService {
     }
 
     @Transactional
-    public String signup(SignupRequest signupRequest) {
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
+    public void signup(SignupRequest signupRequest) {
         if (memberRepository.existsByUserId(signupRequest.getUserId())){
-            throw new CustomException(ErrorCode.DUPLICATE_ID,className,methodName,"ID : " + signupRequest.getUserId());
+            throw new CustomException(ErrorCode.DUPLICATE_ID);
         }
         Member newMember = Member.builder()
                 .email(signupRequest.getEmail())
@@ -81,56 +76,53 @@ public class AuthService {
                 .userId(signupRequest.getUserId())
                 .role(MemberRole.USER).build();
         memberRepository.save(newMember);
-        log.info("[{}, class={}, method={}, name={}, userId={}]", LogMessage.MEMBER_SIGNUP,className,methodName,
+        log.info("{}, CLASS={}, METHOD={}, NAME={}, USER_ID={}",
+                LogMessage.MEMBER_SIGNUP, "AuthService", "signup",
                 signupRequest.getName(),signupRequest.getUserId());
-        return "회원가입을 완료하였습니다.";
     }
 
     public TokenResponse login(LoginRequest loginRequest){
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         try{
             UsernamePasswordAuthenticationToken authenticationToken
                     = new UsernamePasswordAuthenticationToken(loginRequest.getUserId(),loginRequest.getPassword());
             Authentication authentication = authenticationManager.getObject()
                     .authenticate(authenticationToken);
-            log.info("[{}, class={}, method={}, userId={}]", LogMessage.MEMBER_LOGIN,className,methodName,loginRequest.getUserId());
+            log.info("{}, CLASS={}, METHOD={}, USER_ID={}",
+                    LogMessage.MEMBER_LOGIN, "AuthService", "login",
+                    loginRequest.getUserId());
             return createTokenAndSaveInCache(authentication,loginRequest.getUserId());
         }catch (InternalAuthenticationServiceException | BadCredentialsException e){
-            throw new CustomException(ErrorCode.BAD_CREDENTIAL,className,methodName,e.getMessage());
+            throw new CustomException(ErrorCode.BAD_CREDENTIAL);
         }
     }
 
     public TokenResponse reissueToken(String refreshToken){
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
 
         Authentication authentication;
         try{
             authentication = jwtTokenProvider.validateToken(refreshToken.trim());
         }catch (JWTVerificationException e){
-            throw new CustomException(ErrorCode.INVALID_TOKEN,className,methodName,e.getMessage());
+            log.error("{}, CLASS={}, METHOD={}, TOKEN={}, ERROR={}",
+                    LogMessage.INVALID_TOKEN, "AuthService", "reissueToken",
+                    refreshToken,e.getMessage());
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
+
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         String userId = principalDetails.getUsername();
 
         Optional<String> existRefreshToken = authCacheService.getRefreshToken(userId);
         if (existRefreshToken.isEmpty() || !existRefreshToken.get().equals(refreshToken)){
-            throw new CustomException(ErrorCode.BAD_CREDENTIAL,className,methodName, "TOKEN : " + refreshToken);
+            throw new CustomException(ErrorCode.BAD_CREDENTIAL);
         }
         return createTokenAndSaveInCache(authentication,userId);
     }
 
 
-    public String logout(String userId){
+    public void logout(String userId){
         authCacheService.deleteKey(userId);
         SecurityContextHolder.clearContext();
-        return "로그아웃에 성공하였습니다.";
     }
 
 

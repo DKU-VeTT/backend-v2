@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class OutboxCacheService {
 
     private final RedisTemplate<String,String> redisTemplate;

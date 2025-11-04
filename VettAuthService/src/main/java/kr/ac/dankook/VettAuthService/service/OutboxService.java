@@ -8,13 +8,13 @@ import kr.ac.dankook.VettAuthService.entity.outbox.OutboxStatus;
 import kr.ac.dankook.VettAuthService.error.ErrorCode;
 import kr.ac.dankook.VettAuthService.error.exception.CustomException;
 import kr.ac.dankook.VettAuthService.error.exception.EntityNotFoundException;
+import kr.ac.dankook.VettAuthService.log.LogMessage;
 import kr.ac.dankook.VettAuthService.repository.OutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -26,56 +26,45 @@ public class OutboxService {
 
     private final OutboxRepository outboxRepository;
     private final ObjectMapper objectMapper;
-    // Outbox ttl 1시간
     public static final long OUTBOX_TTL = 1000 * 60 * 60;
 
-    private String makeOutboxPayload(String eventId, Map<String,String> payloadMap, OutboxEventType outboxEventType){
+    public Outbox makeMemberOutbox(OutboxEventType eventType, String userKey){
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
-        Map<String, Object> payload = new HashMap<>();
-        String eventDomain = outboxEventType.getEventDomain();
-        String eventType = outboxEventType.getEventType();
-
-        payload.put("id",eventId);
-        payload.put("eventDomain",eventDomain);
-        payload.put("eventType",eventType);
-        payload.put("payload", payloadMap);
-        try{
-            return objectMapper.writeValueAsString(payload);
-        }catch (JsonProcessingException e){
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR,className,methodName,e.getMessage());
-        }
-    }
-
-    public Outbox makeOutbox(Map<String,String> payloadMap,OutboxEventType eventType, String partitionKey){
+        Map<String,Object> payloadMap = new HashMap<>();
 
         String eventId = UUID.randomUUID().toString();
-        String payload = makeOutboxPayload(eventId,payloadMap,eventType);
+        String eventDomain = eventType.getEventDomain();
+        String eventTopic = eventType.getEventTopic();
+
+        payloadMap.put("id", eventId);
+        payloadMap.put("eventDomain", eventDomain);
+        payloadMap.put("eventTopic", eventTopic);
+        payloadMap.put("userKey", userKey);
+
+        String payload;
+        try {
+            payload = objectMapper.writeValueAsString(payloadMap);
+        } catch (JsonProcessingException e) {
+            log.error("{}, CLASS={}, METHOD={}, ERROR={}",
+                    LogMessage.JSON_PROCESSING_ERROR, "OutboxService", "makeMemberOutbox",
+                    e.getMessage());
+            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+        }
         return Outbox.builder()
                 .id(eventId)
                 .eventDomain(eventType.getEventDomain())
-                .eventType(eventType.getEventType())
+                .eventTopic(eventType.getEventTopic())
                 .payload(payload)
-                .partitionKey(partitionKey)
+                .partitionKey(userKey)
                 .status(OutboxStatus.READY_TO_PUBLISH)
                 .build();
     }
 
-
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void convertOutboxStatus(String id,OutboxStatus outboxStatus){
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         Outbox outbox = outboxRepository.findById(id)
-                .orElseThrow(() ->  new EntityNotFoundException("저장된 데이터가 존재하지 않습니다.",className,methodName));
+                .orElseThrow(() ->  new EntityNotFoundException("저장된 데이터가 존재하지 않습니다."));
         outbox.setStatus(outboxStatus);
         outboxRepository.save(outbox);
     }
-
 }
