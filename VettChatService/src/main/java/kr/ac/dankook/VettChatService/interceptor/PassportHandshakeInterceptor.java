@@ -30,14 +30,10 @@ public class PassportHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest req, ServerHttpResponse res,
                                    WebSocketHandler wsHandler, Map<String, Object> attrs) {
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         var headers = req.getHeaders();
         log.info("Request WS Handshake");
         String passportKey = headers.getFirst("X-Passport-Secret");
-        if (!passportKey.equals(PASSPORT_SECRET_KEY)) throw new CustomException(ErrorCode.UNAUTHORIZED,className,methodName);
+        if (!passportKey.equals(PASSPORT_SECRET_KEY)) throw new CustomException(ErrorCode.UNAUTHORIZED);
 
         String passportString = headers.getFirst("X-Passport");
         String decodedString = new String(Base64.getDecoder().decode(passportString), StandardCharsets.UTF_8);

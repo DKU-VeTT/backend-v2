@@ -34,7 +34,7 @@ public class ChatEventPublisher {
         try{
             payload = objectMapper.writeValueAsString(request);
         }catch (JsonProcessingException e){
-            log.error("{}, CLASS={}, METHOD={}, DETAIL={}",
+            log.error("{}, CLASS={}, METHOD={}, ERROR={}",
                     LogMessage.JSON_PROCESSING_ERROR, "ChatEventPublisher", "sendChatMessage", e.getMessage());
             throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
         }

@@ -3,7 +3,7 @@ package kr.ac.dankook.VettChatService.service;
 import kr.ac.dankook.VettChatService.dto.request.ChatMessageRequest;
 import kr.ac.dankook.VettChatService.dto.response.ChatResponse;
 import kr.ac.dankook.VettChatService.entity.ChatMessage;
-import kr.ac.dankook.VettChatService.event.SendChatEventPublisher;
+import kr.ac.dankook.VettChatService.event.ChatEventPublisher;
 import kr.ac.dankook.VettChatService.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class ChatService {
 
-    private final SendChatEventPublisher chatEventPublisher;
+    private final ChatEventPublisher chatEventPublisher;
     private final ChatMessageRepository chatMessageRepository;
 
     public void sendChatMessage(ChatMessageRequest request){

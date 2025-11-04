@@ -22,15 +22,10 @@ public class ChatRoomPinService {
 
     @Transactional
     public boolean toggleChatRoomPin(Long roomId,String memberId){
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         ChatRoom chatRoom = chatRoomRepository.findByIdWithOptimisticLock(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다.",className,methodName));
+                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
         ChatRoomParticipant participant = chatRoomParticipantRepository
-                .findByChatRoomAndMemberId(chatRoom, memberId).orElseThrow(() -> new EntityNotFoundException("현재 참여하고 있는 채팅방이 아닙니다.",className,methodName));
+                .findByChatRoomAndMemberId(chatRoom, memberId).orElseThrow(() -> new EntityNotFoundException("현재 참여하고 있는 채팅방이 아닙니다."));
         participant.togglePin();
         chatRoomParticipantRepository.save(participant);
         return participant.isPin();

@@ -9,6 +9,7 @@ import kr.ac.dankook.VettChatService.entity.Passport;
 import kr.ac.dankook.VettChatService.error.ErrorCode;
 import kr.ac.dankook.VettChatService.error.exception.CustomException;
 import kr.ac.dankook.VettChatService.facade.ChatRoomJoinFacade;
+import kr.ac.dankook.VettChatService.log.LogMessage;
 import kr.ac.dankook.VettChatService.service.ChatRoomJoinService;
 import kr.ac.dankook.VettChatService.service.ChatRoomPinService;
 import kr.ac.dankook.VettChatService.service.ChatRoomService;
@@ -114,18 +115,16 @@ public class ChatRoomController {
             @RequestParam("nickname") String nickname,
             @PassportMember Passport passport
     ) {
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         ChatRoomResponse res = idempotencyService.execute(
                 key,
                 () -> {
                     try {
                         return chatRoomJoinFacade.joinChatRoom(roomId,nickname,passport.getKey());
                     } catch (InterruptedException e){
-                        throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, className, methodName);
+                        log.error("{}, CLASS={}, METHOD={}, ERROR={}",
+                                LogMessage.INTERRUPT_ERROR, "ChatRoomController", "joinChatRoom",
+                                e.getMessage());
+                        throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
                     }
                 },
                 ChatRoomResponse.class

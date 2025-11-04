@@ -1,8 +1,8 @@
 package kr.ac.dankook.VettChatService.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.ac.dankook.VettChatService.dto.request.ChatMessageRequest;
-import kr.ac.dankook.VettChatService.log.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,22 +21,12 @@ public class ChatEventSubscriber {
     private final SimpMessageSendingOperations messagingTemplate;
     private final ObjectMapper objectMapper;
 
-    // Have Three partitions
     @KafkaListener(groupId = "VETT_CHAT", topics = CHAT_TOPIC, concurrency = "3")
-    public void handleReceiveChatMessage(String message, Acknowledgment acknowledgment) {
+    public void handleReceiveChatMessage(String message, Acknowledgment ack) throws JsonProcessingException {
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
+        ChatMessageRequest messageDto = objectMapper.readValue(message, ChatMessageRequest.class);
+        messagingTemplate.convertAndSend(DESTINATION_PREFIX +  messageDto.getRoomId(), messageDto);
 
-        try{
-            ChatMessageRequest messageDto = objectMapper.readValue(message, ChatMessageRequest.class);
-            messagingTemplate.convertAndSend(DESTINATION_PREFIX +  messageDto.getRoomId(), messageDto);
-            acknowledgment.acknowledge();
-        }catch(Exception e){
-            log.error(
-                "[{}, class={}, method={}, message={}, error={}]",
-                LogMessage.KAFKA_LISTENER_EXCEPTION,className,methodName, message, e.getMessage());
-        }
+        ack.acknowledge();
     }
 }

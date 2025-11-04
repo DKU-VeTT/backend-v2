@@ -31,6 +31,7 @@ public enum ErrorCode {
     // 서버 에러
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"S001","서버 내부 오류가 발생하였습니다."),
     JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"S002", "내부 객체 변형과정에서 에러가 발생하였습니다.");
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;

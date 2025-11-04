@@ -25,11 +25,10 @@ public class EventRecordScheduler {
     @Scheduled(fixedDelay = 60000 * 10)
     @Transactional
     public void recordDeleteScheduler(){
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-        log.info("[{}, class={}, method={}, date={}]",
-                LogMessage.RECORD_DELETE_SCHEDULER, className, methodName, LocalDateTime.now());
+
+        log.info("{}, CLASS={}, METHOD={}, DATE={}",
+                LogMessage.RECORD_DELETE_SCHEDULER, "EventRecordScheduler", "recordDeleteScheduler",
+                LocalDateTime.now());
 
         entityManager.flush();
         List<EventRecord> oldRecords = eventRecordRepository.findOldRecordsByTimestamp(CLEANUP_SECONDS);

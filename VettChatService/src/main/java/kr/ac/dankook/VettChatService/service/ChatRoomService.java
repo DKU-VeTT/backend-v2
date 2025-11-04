@@ -64,16 +64,11 @@ public class ChatRoomService {
 
     @Transactional
     public void updateUnreadMessages(Long roomId, String memberId){
-
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다.",className,methodName));
+                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
         ChatRoomParticipant participant = chatRoomParticipantRepository
                 .findByChatRoomAndMemberId(chatRoom, memberId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방 참가자를 찾을 수 없습니다.",className,methodName));
+                .orElseThrow(() -> new EntityNotFoundException("채팅방 참가자를 찾을 수 없습니다."));
         participant.setCurrentReadNumber(chatRoom.getLastMessageNumber());
         chatRoomParticipantRepository.save(participant);
     }
