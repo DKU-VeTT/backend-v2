@@ -4,7 +4,7 @@
     <springProperty scope="context" name="LOGSTASH_HOST" source="logstash.host"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%clr([%d{yyyy-MM-dd HH:mm:ss.SSS}]){magenta} %clr([%-5level]) [Eureka Service] [%thread Thread] %clr(%logger{36}){cyan} %msg %n</pattern>
+            <pattern>%clr([%d{yyyy-MM-dd HH:mm:ss.SSS}]){magenta} %clr([%-5level]) [%thread Thread] %clr(%logger{36}){cyan} [SERVICE=EUREKA] [MESSAGE=%msg]%n</pattern>
         </encoder>
     </appender>
 
@@ -12,7 +12,7 @@
         <destination>${LOGSTASH_HOST}:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <includeMdc>false</includeMdc>
-            <customFields>{ "service":"Eureka","env":"local" }</customFields>
+            <customFields>{ "service" : "EUREKA" }</customFields>
         </encoder>
         <keepAliveDuration>5 minutes</keepAliveDuration>
         <reconnectionDelay>3 seconds</reconnectionDelay>
@@ -22,7 +22,7 @@
         <destination>${LOGSTASH_HOST}:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <includeMdc>false</includeMdc>
-            <customFields>{ "service":"Eureka","env":"local" }</customFields>
+            <customFields>{ "service" : "EUREKA" }</customFields>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
