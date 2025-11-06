@@ -1,0 +1,39 @@
+### GET ALL EVENT
+GET http://localhost:8080/api/v1/observability/events
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzY1MDE2Njc2LCJrZXkiOiJSMFJTSHFTaHB0S1pGeXhfZXc3WUhRIiwicm9sZSI6Iuq0gOumrOyekCJ9.9R0FvglwlbEoqAP4bS1AzeOhAw1sT-MpsngTsQH_C8IJvw2msgG02F4OzI27k6I2PrkBKt4ziWsGoWW3G8OdrQ
+
+### GET EVENT by status
+GET http://localhost:8080/api/v1/observability/events/PUBLISH_FAILED
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzY1MDE2Njc2LCJrZXkiOiJSMFJTSHFTaHB0S1pGeXhfZXc3WUhRIiwicm9sZSI6Iuq0gOumrOyekCJ9.9R0FvglwlbEoqAP4bS1AzeOhAw1sT-MpsngTsQH_C8IJvw2msgG02F4OzI27k6I2PrkBKt4ziWsGoWW3G8OdrQ
+
+### POST RETRY REPUBLISH
+POST http://localhost:8080/api/v1/observability/events/6909fe4bac3c13a007d5d57f
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzY1MDE2Njc2LCJrZXkiOiJSMFJTSHFTaHB0S1pGeXhfZXc3WUhRIiwicm9sZSI6Iuq0gOumrOyekCJ9.9R0FvglwlbEoqAP4bS1AzeOhAw1sT-MpsngTsQH_C8IJvw2msgG02F4OzI27k6I2PrkBKt4ziWsGoWW3G8OdrQ
+Idempotency-Key: askdasmdasdasd
+
+### DELETE EVENT
+DELETE http://localhost:8080/api/v1/observability/events/6909fd1eac3c13a007d5d57e
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzY1MDE2Njc2LCJrZXkiOiJSMFJTSHFTaHB0S1pGeXhfZXc3WUhRIiwicm9sZSI6Iuq0gOumrOyekCJ9.9R0FvglwlbEoqAP4bS1AzeOhAw1sT-MpsngTsQH_C8IJvw2msgG02F4OzI27k6I2PrkBKt4ziWsGoWW3G8OdrQ
+### PATCH EVENT
+PATCH http://localhost:8080/api/v1/observability/events/6909fe4bac3c13a007d5d57f
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJva2MwMjAyIiwiZXhwIjoxNzY1MDE2Njc2LCJrZXkiOiJSMFJTSHFTaHB0S1pGeXhfZXc3WUhRIiwicm9sZSI6Iuq0gOumrOyekCJ9.9R0FvglwlbEoqAP4bS1AzeOhAw1sT-MpsngTsQH_C8IJvw2msgG02F4OzI27k6I2PrkBKt4ziWsGoWW3G8OdrQ
+Content-Type: application/json
+
+{
+  "topic" : "TestTopic",
+  "partitionKey" : "PartitionKEY",
+  "status" : "CONSUME_FAILED",
+  "payload": {
+    "id": "7cdea1f4-4a99-471b-9102-c69a82ea2866",
+    "eventTopic": "user.event.deleted",
+    "eventDomain": "USER",
+    "eventType": "DELETED",
+    "userKey": "USER_KEY",
+    "sourceService": "VETT_MEMBER",
+    "traceId": "f3b2c6a7f9d14e5a",
+    "spanId": "9c4ef0123ab7de89",
+    "occurredAt": "2025-11-06T10:15:30Z"
+  }
+}
+
+

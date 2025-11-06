@@ -1,7 +1,9 @@
 package kr.ac.dankook.VettObservabilityService.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.ac.dankook.VettObservabilityService.document.EventDocument;
+import kr.ac.dankook.VettObservabilityService.document.EventStatus;
+import kr.ac.dankook.VettObservabilityService.log.LogMessage;
+import kr.ac.dankook.VettObservabilityService.repository.EventDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,36 +18,50 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FailedEventSubscriber {
 
-    private final ObjectMapper objectMapper;
+    private final EventDocumentRepository eventDocumentRepository;
 
     @KafkaListener(groupId = "VETT_OBSERVATION", topicPattern = ".*\\.dlt")
-    public void consumeDTLRecord(
+    public void consumeDltRecord(
             @Payload String payload,
             @Header(KafkaHeaders.RECEIVED_KEY) String partitionKey,
-            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
             @Header("service-name") String serviceName,
             @Header("original-topic") String originalTopic,
             @Header("error-class") String errorClass,
             @Header("error-message") String errorMessage,
             Acknowledgment ack){
 
-        log.info("DLT Record {} {} {}", payload,partitionKey,topic);
-        log.info("Error Info {} {}",errorClass,errorMessage);
+        log.info("{}, CLASS={}, METHOD={}, SERVICE_NAME={}, ERROR_CLASS_NAME={}, ERROR={}, TOPIC={}, PARTITION_KEY={}, PAYLOAD={}",
+                LogMessage.CONSUME_DLT_RECORD, "FailedEventSubscriber", "consumeDltRecord",
+                serviceName, errorClass, errorMessage, originalTopic, partitionKey, payload);
+        eventDocumentRepository.save(
+                makeEventDocument(serviceName,errorClass,errorMessage,
+                originalTopic,partitionKey,payload,EventStatus.CONSUME_FAILED));
         ack.acknowledge();
     }
 
     @KafkaListener(groupId = "VETT_OBSERVATION", topicPattern = ".*\\.pdlt")
     public void consumeFailPublishRecord(
-            @Payload String payload, Acknowledgment ack) {
+            @Payload String payload,
+            @Header(KafkaHeaders.RECEIVED_KEY) String partitionKey,
+            @Header("service-name") String serviceName,
+            @Header("original-topic") String originalTopic,
+            @Header("error-class") String errorClass,
+            @Header("error-message") String errorMessage,
+            Acknowledgment ack) {
 
-        try{
-            FailedEvent failedEvent = objectMapper.readValue(payload, FailedEvent.class);
-            log.info("PDLT {} {} {} {} {} {}",failedEvent.getServiceName(),failedEvent.getClassName(),
-                    failedEvent.getOriginalTopic(),
-                    failedEvent.getPartitionKey(),failedEvent.getPayload().toString(), failedEvent.getErrorMessage());
-        }catch (JsonProcessingException e){
-
-        }
+        log.info("{}, CLASS={}, METHOD={}, SERVICE_NAME={}, ERROR_CLASS_NAME={}, ERROR={}, TOPIC={}, PARTITION_KEY={}, PAYLOAD={}",
+                LogMessage.CONSUME_PDLT_RECORD, "FailedEventSubscriber", "consumeFailPublishRecord",
+                serviceName,errorClass,errorMessage,originalTopic,partitionKey, payload);
+        eventDocumentRepository.save(
+                makeEventDocument(serviceName,errorClass,errorMessage,
+                originalTopic,partitionKey,payload,EventStatus.PUBLISH_FAILED));
         ack.acknowledge();
+    }
+
+    private EventDocument makeEventDocument(String serviceName, String errorClass, String errorMessage,
+                                            String topic, String partitionKey, String payload, EventStatus status){
+        return EventDocument
+                .builder().serviceName(serviceName).errorClass(errorClass).errorMessage(errorMessage)
+                .topic(topic).partitionKey(partitionKey).payload(payload).status(status).build();
     }
 }
