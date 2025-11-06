@@ -34,7 +34,7 @@ public class KafkaConsumerConfig {
 
     private final KafkaTemplate<String,String> kafkaTemplate;
     private static final String DLT_SUFFIX = ".dlt";
-    private static final String SERVICE_NAME = "CHAT";
+    public static final String SERVICE_NAME = "CHAT";
 
     @Bean
     public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(){
@@ -44,7 +44,7 @@ public class KafkaConsumerConfig {
                     record.headers().add("original-topic", record.topic().getBytes(StandardCharsets.UTF_8));
                     record.headers().add("error-class", ex.getClass().getName().getBytes(StandardCharsets.UTF_8));
                     record.headers().add("error-message",ex.getMessage().getBytes(StandardCharsets.UTF_8));
-                    return new TopicPartition(record.topic()+DLT_SUFFIX,record.partition());
+                    return new TopicPartition(record.topic()+DLT_SUFFIX, record.partition());
                 });
     }
 

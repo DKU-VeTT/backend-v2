@@ -8,13 +8,13 @@ import kr.ac.dankook.VettChatService.error.exception.CustomException;
 import kr.ac.dankook.VettChatService.log.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import static kr.ac.dankook.VettChatService.config.kafka.KafkaConsumerConfig.SERVICE_NAME;
 
 @Component
 @RequiredArgsConstructor
@@ -29,23 +29,14 @@ public class FailedEventPublisher {
     @Transactional
     public void sendFailedEvent(String topic, String className, String partitionKey, String payload, String errorMessage){
 
-        Map<String, Object> payloadMap = new HashMap<>();
-        payloadMap.put("message", payload);
+        ProducerRecord<String, String> record =
+                new ProducerRecord<>(topic + DLT_SUFFIX, partitionKey, payload);
 
-        FailedEvent failedEvent = FailedEvent.builder()
-                .serviceName("CHAT")
-                .className(className)
-                .originalTopic(topic)
-                .partitionKey(partitionKey)
-                .errorMessage(errorMessage)
-                .payload(payloadMap).build();
-        try {
-            String payloadString = objectMapper.writeValueAsString(failedEvent);
-            kafkaTemplate.send(topic + DLT_SUFFIX, partitionKey, payloadString);
-        } catch (JsonProcessingException e) {
-            log.error("{}, CLASS={}, METHOD={}, ERROR={}",
-                    LogMessage.JSON_PROCESSING_ERROR, "FailedEventPublisher", "sendFailedEvent", e.getMessage());
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
-        }
+        record.headers().add("service-name", SERVICE_NAME.getBytes(StandardCharsets.UTF_8));
+        record.headers().add("original-topic", topic.getBytes(StandardCharsets.UTF_8));
+        record.headers().add("error-class", className.getBytes(StandardCharsets.UTF_8));
+        record.headers().add("error-message", errorMessage.getBytes(StandardCharsets.UTF_8));
+
+        kafkaTemplate.send(record);
     }
 }
