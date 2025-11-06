@@ -33,7 +33,7 @@ public class KafkaConsumerConfig {
 
     private final KafkaTemplate<String,String> kafkaTemplate;
     private static final String DLT_SUFFIX = ".dlt";
-    private static final String SERVICE_NAME = "AI_RECORD";
+    private static final String SERVICE_NAME = "AI RECORD";
 
     @Bean
     public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(){
