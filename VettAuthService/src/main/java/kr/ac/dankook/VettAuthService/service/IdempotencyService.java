@@ -7,7 +7,6 @@ import kr.ac.dankook.VettAuthService.error.exception.CustomException;
 import kr.ac.dankook.VettAuthService.log.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.utils.Utils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
