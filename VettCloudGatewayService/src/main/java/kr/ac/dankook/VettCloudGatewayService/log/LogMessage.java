@@ -1,19 +1,15 @@
 package kr.ac.dankook.VettCloudGatewayService.log;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public enum LogMessage {
 
     GATEWAY_REQUEST,
     SUCCESS_GATEWAY_JWT_AUTHENTICATION,
     SUCCESS_GATEWAY_PASSPORT,
     GATEWAY_RESPONSE,
+    TOKEN_EXPIRED,
+    INVALID_TOKEN,
 
     FALLBACK_CALLED_PASSPORT_GRPC,
-    ERROR_IN_GATEWAY,
+    JSON_PROCESSING_ERROR,
     ERROR_RESPONSE_SERIALIZATION_FAILED
-
 }

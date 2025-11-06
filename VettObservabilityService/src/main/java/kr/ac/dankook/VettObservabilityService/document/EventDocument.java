@@ -1,6 +1,5 @@
 package kr.ac.dankook.VettObservabilityService.document;
 
-import kr.ac.dankook.VettObservabilityService.event.ServiceEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,15 +28,4 @@ public class EventDocument {
     private String status;
     private LocalTime time;
     private String serviceName;
-
-    public EventDocument(ServiceEvent serviceEvent) {
-        this.eventId = serviceEvent.getEventId();
-        this.eventDomain = serviceEvent.getEventDomain();
-        this.eventType = serviceEvent.getEventType();
-        this.partitionKey = serviceEvent.getPartitionKey();
-        // this.payload = serviceEvent.getPayload();
-        this.status = serviceEvent.getStatus().toString();
-        this.serviceName = serviceEvent.getServiceName();
-        this.time = LocalTime.now();
-    }
 }

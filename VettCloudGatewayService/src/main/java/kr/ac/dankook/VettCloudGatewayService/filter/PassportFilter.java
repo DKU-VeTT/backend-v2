@@ -35,10 +35,6 @@ public class PassportFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         String path = exchange.getRequest().getURI().getPath();
         if (path.startsWith("/api/v1/auth") || path.startsWith("/actuator") || path.startsWith("/eureka")
                 || path.startsWith("/ws") || path.startsWith("/pub") || path.startsWith("/sub")){
@@ -47,7 +43,7 @@ public class PassportFilter implements GlobalFilter {
         String key = exchange.getAttribute("key");
         Passport.PassportResponse passport = passportGrpcService.getPassportInfo(key);
 
-        if (passport == null) throw new CustomException(ErrorCode.PASSPORT_ERROR,className,methodName);
+        if (passport == null) throw new CustomException(ErrorCode.PASSPORT_ERROR);
 
         PassportResponse passportEntity = new PassportResponse(passport);
         String payload;
@@ -55,8 +51,12 @@ public class PassportFilter implements GlobalFilter {
         try{
             payload = objectMapper.writeValueAsString(passportEntity);
         }catch (JsonProcessingException e){
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR,className,methodName,e.getMessage());
+            log.error("{}, CLASS={}, METHOD={}, ERROR={}",
+                    LogMessage.JSON_PROCESSING_ERROR, "PassportFilter", "filter",
+                    e.getMessage());
+            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
         }
+
         String encodedPayload = Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
         ServerHttpRequest mutatedRequest = exchange.getRequest()
                 .mutate()
@@ -67,9 +67,9 @@ public class PassportFilter implements GlobalFilter {
                     httpHeaders.add("X-Passport", encodedPayload);
                 })
                 .build();
-        log.info(
-                "[{}, class={}, method={}, userKey={}]",
-                LogMessage.SUCCESS_GATEWAY_PASSPORT,className,methodName, key);
+
+        log.info("{}, CLASS={}, METHOD={}, USER_KEY={}",
+                LogMessage.SUCCESS_GATEWAY_PASSPORT, "PassportFilter", "filter", key);
         ServerWebExchange mutatedExchange = exchange.mutate()
                 .request(mutatedRequest)
                 .build();

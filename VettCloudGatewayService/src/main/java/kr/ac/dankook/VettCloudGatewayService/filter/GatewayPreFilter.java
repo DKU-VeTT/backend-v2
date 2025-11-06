@@ -20,15 +20,12 @@ public class GatewayPreFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         ServerHttpRequest request = exchange.getRequest();
         exchange.getAttributes().put(REQ_START_NS,System.currentTimeMillis());
-        log.info(
-                "[{}, class={}, method={}, uri={}]",
-                LogMessage.GATEWAY_REQUEST, className, methodName, request.getURI().getPath());
+
+        log.info("{}, CLASS={}, METHOD={}, URI={}",
+                LogMessage.GATEWAY_REQUEST, "GatewayPreFilter", "filter",
+                request.getURI().getPath());
         return chain.filter(exchange);
     }
 }

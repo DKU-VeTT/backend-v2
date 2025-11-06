@@ -21,20 +21,13 @@ public class GatewayPostFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-        return chain.filter(exchange)
-                .doFinally(s -> {
-                    ServerHttpRequest request = exchange.getRequest();
-                    long start = exchange.getAttribute(GatewayPreFilter.REQ_START_NS);
-                    long finish = System.currentTimeMillis() - start;
+        ServerHttpRequest request = exchange.getRequest();
+        long start = exchange.getAttribute(GatewayPreFilter.REQ_START_NS);
+        long finish = System.currentTimeMillis() - start;
+        log.info("{}, CLASS={}, METHOD={}, URI={}, STATUS_CODE={}, LATENCY_MS={}ms",
+                LogMessage.GATEWAY_RESPONSE, "GatewayPostFilter", "filter",
+                request.getURI().getPath(), exchange.getResponse().getStatusCode(),finish);
 
-                    String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-                    String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-                    String className = classNames[classNames.length - 1];
-
-                    log.info(
-                            "[{}, class={}, method={}, uri={}, statusCode={}, latency_ms={}ms]",
-                            LogMessage.GATEWAY_RESPONSE,className,methodName,
-                            request.getURI().getPath(), exchange.getResponse().getStatusCode(),finish);
-                });
+        return chain.filter(exchange);
     }
 }

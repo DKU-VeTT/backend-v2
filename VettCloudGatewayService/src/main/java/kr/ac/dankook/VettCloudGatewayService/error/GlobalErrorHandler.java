@@ -26,11 +26,6 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
     @NonNull
     public Mono<Void> handle(ServerWebExchange exchange,@NonNull Throwable ex) {
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-        String detailError = "NONE";
-
         var response = exchange.getResponse();
         if (response.isCommitted()) return Mono.error(ex);
 
@@ -38,9 +33,6 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
 
         if (ex instanceof CustomException ce){
             errorCode = ce.getErrorCode();
-            className = ce.getClassName();
-            methodName = ce.getMethodName();
-            detailError = ce.getDetailMessage();
         }else errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
 
         ErrorResponse errorResponse = getErrorResponse(errorCode, ex);
@@ -51,14 +43,11 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
         try {
             byte[] bytes = objectMapper.writeValueAsBytes(errorResponse);
             DataBuffer buffer = response.bufferFactory().wrap(bytes);
-            log.error(
-                    "[{}, class={}, method={}, error={}, detailError={}]",
-                    LogMessage.ERROR_IN_GATEWAY,className,methodName, errorResponse.getMessage(),detailError);
             return response.writeWith(Mono.just(buffer));
         } catch (Exception e) {
-            log.error(
-                    "[{}, class={}, method={}, error={}]",
-                    LogMessage.ERROR_RESPONSE_SERIALIZATION_FAILED,className,methodName,e.getMessage());
+            log.error("{}, CLASS={}, METHOD={}, ERROR={}",
+                    LogMessage.ERROR_RESPONSE_SERIALIZATION_FAILED, "GlobalErrorHandler", "handle",
+                    e.getMessage());
             byte[] bytes = e.getMessage()
                     .getBytes(StandardCharsets.UTF_8);
             DataBuffer buffer = response.bufferFactory().wrap(bytes);

@@ -33,10 +33,6 @@ public class AuthenticationFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-        String[] classNames = Thread.currentThread().getStackTrace()[1].getClassName().split("\\.");
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-        String className = classNames[classNames.length - 1];
-
         String path = exchange.getRequest().getURI().getPath();
         if (path.startsWith("/api/v1/auth") || path.startsWith("/actuator") || path.startsWith("/ws") ||
                 path.startsWith("/pub") || path.startsWith("/sub")){
@@ -44,7 +40,7 @@ public class AuthenticationFilter implements GlobalFilter {
         }
         String token = resolveToken(exchange);
         if (token == null){
-            throw new CustomException(ErrorCode.UNAUTHORIZED,className,methodName);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
         try{
@@ -52,14 +48,20 @@ public class AuthenticationFilter implements GlobalFilter {
                     .build()
                     .verify(token);
             String key = jwt.getClaim("key").asString();
-            log.info(
-                    "[{}, class={}, method={}, userKey={}]",
-                    LogMessage.SUCCESS_GATEWAY_JWT_AUTHENTICATION, className, methodName, key);
+            log.info("{}, CLASS={}, METHOD={}, USER_KEY={}",
+                    LogMessage.SUCCESS_GATEWAY_JWT_AUTHENTICATION, "AuthenticationFilter", "filter",
+                    key);
             exchange.getAttributes().put("key",key);
         } catch (TokenExpiredException e){
-            throw new CustomException(ErrorCode.EXPIRED_TOKEN,className,methodName,"TOKEN : " + token);
+            log.error("{}, CLASS={}, METHOD={}, TOKEN={}, ERROR={}",
+                    LogMessage.TOKEN_EXPIRED, "AuthenticationFilter", "filter",
+                    token, e.getMessage());
+            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
         } catch (JWTVerificationException e){
-            throw new CustomException(ErrorCode.INVALID_TOKEN,className,methodName,"TOKEN : " + token);
+            log.error("{}, CLASS={}, METHOD={}, TOKEN={}, ERROR={}",
+                    LogMessage.INVALID_TOKEN, "AuthenticationFilter", "filter",
+                    token, e.getMessage());
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
         return chain.filter(exchange);
     }
